@@ -1,9 +1,9 @@
 {
-  "name": "geodle",
+  "name": "geodle-test",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "homepage": "https://geodle.me",
+  "homepage": "https://test.geodle.me",
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.14.1",
