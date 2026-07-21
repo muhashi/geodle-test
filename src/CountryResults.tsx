@@ -28,10 +28,12 @@ type HintResult = 'correct' | 'up' | 'down' | 'wrong';
 // and only force a mid-word break as a last resort, rather than breaking
 // anywhere. `lang` is required for the hyphenation dictionary to kick in.
 const wrapStyle = {
-  wordBreak: 'normal' as const,
+  wordBreak: 'break-word' as const,
   overflowWrap: 'break-word' as const,
   hyphens: 'auto' as const,
   WebkitHyphens: 'auto' as const,
+  mozHyphens: 'auto' as const,
+  msHyphens: 'auto' as const,
 };
 
 /* ---------------- Icons ---------------- */
@@ -176,7 +178,7 @@ function ResultCard({ background, children }: { background: string; children: Re
         ta="center"
         lang="en"
         style={{
-          fontSize: 'clamp(0.5rem, 1.8vw, 0.875rem)',
+          fontSize: 'clamp(0.4rem, 1.95vw, 0.875rem)',
           lineHeight: 1.15,
           ...wrapStyle,
         }}
