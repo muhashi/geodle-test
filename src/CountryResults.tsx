@@ -109,7 +109,7 @@ const COLUMNS: { label: string; icon: () => JSX.Element; tip: string }[] = [
   },
   { label: 'Religion', icon: IconBook, tip: 'Most common religion matches the correct country' },
   { label: 'Avg. Temp.', icon: IconThermometer, tip: 'Temperature within 10% of correct country' },
-  { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
+  // { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
 ];
 
 // Every Grid.Col needs minWidth: 0 -- flex items default to min-width: auto,
@@ -176,7 +176,7 @@ function ResultCard({ background, children }: { background: string; children: Re
         ta="center"
         lang="en"
         style={{
-          fontSize: 'clamp(0.4rem, 1.8vw, 0.875rem)',
+          fontSize: 'clamp(0.5rem, 1.8vw, 0.875rem)',
           lineHeight: 1.15,
           ...wrapStyle,
         }}
@@ -240,7 +240,7 @@ function Results({
 
   return (
     <Box w="100%" maw="50rem" mx="auto" mb="10vh">
-      <Grid columns={7} gutter={matches ? 6 : 1} align="stretch" ml="0.3rem" mr="0.3rem">
+      <Grid columns={6} gutter={matches ? 6 : 1} align="stretch" ml="0.3rem" mr="0.3rem">
         {/* Header row */}
         <Grid.Col span={1} style={colStyle}>
           <Box
@@ -282,7 +282,7 @@ function Results({
             guessData.landlocked,
             guessData.religion,
             guessData.temperatureCelsius,
-            guessData.surfaceArea,
+            // guessData.surfaceArea,
           ];
           const correctValues: DemographicDataType[] = [
             correctData.continent,
@@ -290,7 +290,7 @@ function Results({
             correctData.landlocked,
             correctData.religion,
             correctData.temperatureCelsius,
-            correctData.surfaceArea,
+            // correctData.surfaceArea,
           ];
           const isCorrectGuess = guessData.country === correctData.country;
 
