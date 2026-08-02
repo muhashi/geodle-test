@@ -430,7 +430,7 @@ function Results({
           return (
             <Fragment key={guessData.country}>
               <Grid.Col span={1} style={colStyle}>
-                <ResultCard background={isCorrectGuess ? HINT_GREEN : HINT_RED} border="none">
+                <ResultCard background={isCorrectGuess ? HINT_GREEN : HINT_RED}>
                   {guessData.country}
                 </ResultCard>
               </Grid.Col>
