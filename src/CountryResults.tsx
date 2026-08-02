@@ -2,7 +2,7 @@ import { Fragment, ReactNode, JSX } from 'react';
 import { Box, Grid, Text, Tooltip } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import { formatPopulation, getEmojiHintText, tempFahrenheit } from './helpers';
+import { formatPopulation, getEmojiHintText, tempFahrenheit, km2ToMi2 } from './helpers';
 
 
 const HINT_GREEN = '#6a9955';
@@ -24,10 +24,6 @@ type CountryData = {
 
 type HintResult = 'correct' | 'up' | 'down' | 'wrong';
 
-// Shared wrapping rules: normal word-break with a break-word fallback lets
-// the browser hyphenate at real syllable points (via `hyphens: auto` below)
-// and only force a mid-word break as a last resort, rather than breaking
-// anywhere. `lang` is required for the hyphenation dictionary to kick in.
 const wrapStyle = {
   wordBreak: 'normal' as const,
   overflowWrap: 'break-word' as const,
@@ -36,8 +32,6 @@ const wrapStyle = {
   mozHyphens: 'auto' as const,
   msHyphens: 'auto' as const,
 };
-
-/* ---------------- Icons ---------------- */
 
 const iconProps = {
   viewBox: '0 0 24 24',
@@ -100,8 +94,6 @@ const IconBuilding = () => (
   </svg>
 );
 
-/* ---------------- Column config ---------------- */
-
 const COLUMNS: { label: string; icon: () => JSX.Element; tip: string }[] = [
   { label: 'Continent', icon: IconGlobe, tip: 'Continent matches the correct country' },
   { label: 'Population', icon: IconUsers, tip: 'Population within 10% of correct country' },
@@ -115,9 +107,6 @@ const COLUMNS: { label: string; icon: () => JSX.Element; tip: string }[] = [
   { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
 ];
 
-// Every Grid.Col needs minWidth: 0 -- flex items default to min-width: auto,
-// which uses the content's natural (unbroken) width as a floor and silently
-// overflows the column. This lets our columns actually shrink to fit.
 const colStyle = { minWidth: 0 };
 
 function getHintResult(correct: DemographicDataType, guess: DemographicDataType): HintResult {
@@ -136,7 +125,7 @@ function getHintResult(correct: DemographicDataType, guess: DemographicDataType)
   }
 }
 
-function formatCellValue(columnIndex: number, value: DemographicDataType): string {
+function formatCellValue(columnIndex: number, value: DemographicDataType, isTempFahrenheit: boolean, isAreaMiles: boolean): string {
   switch (columnIndex) {
     case 1: // Population
       return formatPopulation(value as number);
@@ -145,17 +134,17 @@ function formatCellValue(columnIndex: number, value: DemographicDataType): strin
     case 4: // Avg. Temp.
       return value === 0
         ? 'N/A'
+        : isTempFahrenheit
+        ? `${Math.round(tempFahrenheit(value as number))}°F`
         : `${Math.round(value as number)}°C`;
     case 5: // Surface Area
       return value === 0
         ? 'N/A'
-        : `${formatPopulation(value as number)} km²`;
+        : (isAreaMiles ? `${formatPopulation(km2ToMi2(value as number))} mi²` : `${formatPopulation(value as number)} km²`);
     default:
       return String(value);
   }
 }
-
-/* ---------------- Building blocks ---------------- */
 
 function ResultCard({ background, textColor, children }: { background: string; textColor?: string; children: ReactNode }) {
   return (
@@ -206,14 +195,12 @@ function HeaderCell({ label, tip }: { label: string; tip: string }) {
           minWidth: 0,
         }}
       >
-        {/* <Icon /> */}
         <Text
           ta="center"
           fw={700}
           tt="uppercase"
           lang="en"
           style={{
-            // letterSpacing: 0.5,
             color: HEADER_TEXT,
             fontSize: 'clamp(0.3rem, 1.8vw, 0.7rem)',
             textDecoration: 'underline dotted', 
@@ -242,7 +229,6 @@ function MobileStatCard({
   const { label } = COLUMNS[columnIndex];
 
   const sharedBoxStyle = {
-    // border: '2px solid #000',
     borderRadius: 10,
     padding: '6px 4px',
     minHeight: 58,
@@ -278,9 +264,13 @@ function MobileStatCard({
 function MobileGuessCard({
   guessData,
   correctData,
+  isTempFahrenheit,
+  isAreaMiles,
 }: {
   guessData: CountryData;
   correctData: CountryData;
+  isTempFahrenheit: boolean;
+  isAreaMiles: boolean;
 }) {
   const isCorrectGuess = guessData.country === correctData.country;
 
@@ -326,7 +316,7 @@ function MobileGuessCard({
       <Grid columns={3} gutter={6} mt={8}>
         {COLUMNS.map(({label}, columnIndex) => {
           const hint = getHintResult(correctValues[columnIndex], guessValues[columnIndex]);
-          const displayValue = formatCellValue(columnIndex, guessValues[columnIndex]);
+          const displayValue = formatCellValue(columnIndex, guessValues[columnIndex], isTempFahrenheit, isAreaMiles);
 
           return (
             <Grid.Col span={1} key={label} style={colStyle}>
@@ -342,15 +332,19 @@ function MobileGuessCard({
 function MobileResults({
   guessesData,
   correctData,
+  isTempFahrenheit,
+  isAreaMiles,
 }: {
   guessesData: CountryData[];
   correctData: CountryData;
+  isTempFahrenheit: boolean;
+  isAreaMiles: boolean;
 }) {
   return (
     <Box w="95%" maw="50rem" mx="auto" mb="10vh">
       <Box style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {[...guessesData].reverse().map((guessData) => (
-          <MobileGuessCard key={guessData.country} guessData={guessData} correctData={correctData} />
+          <MobileGuessCard key={guessData.country} guessData={guessData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />
         ))}
       </Box>
     </Box>
@@ -360,15 +354,19 @@ function MobileResults({
 function Results({
   guessesData,
   correctData,
+  isTempFahrenheit,
+  isAreaMiles,
 }: {
   guessesData: CountryData[];
   correctData: CountryData;
+  isTempFahrenheit: boolean;
+  isAreaMiles: boolean;
 }) {
   if (guessesData.length === 0) return null;
   const matches = useMediaQuery('(min-width: 600px)');
 
   if (!matches) {
-    return <MobileResults guessesData={guessesData} correctData={correctData} />;
+    return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
   }
 
   return (
@@ -391,7 +389,6 @@ function Results({
               tt="uppercase"
               lang="en"
               style={{
-                // letterSpacing: 0.5,
                 color: HEADER_TEXT,
                 fontSize: 'clamp(0.3rem, 1.8vw, 0.7rem)',
                 ...wrapStyle,
@@ -437,7 +434,7 @@ function Results({
 
               {guessValues.map((guessValue, i) => {
                 const hint = getHintResult(correctValues[i], guessValue);
-                const displayValue = formatCellValue(i, guessValue);
+                const displayValue = formatCellValue(i, guessValue, isTempFahrenheit, isAreaMiles);
 
                 return (
                   <Grid.Col span={1} key={`${guessData.country}-${COLUMNS[i].label}`} style={colStyle}>

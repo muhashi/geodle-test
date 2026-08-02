@@ -1,47 +1,31 @@
-import { useEffect, useState, Fragment } from 'react';
 import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-blast';
 
-import {
-  Box,
-  Stack,
-  Group,
-  Center,
-  Text,
-  Anchor,
-  Button,
-  Switch,
-  Modal,
-  ActionIcon,
-  Grid,
-} from '@mantine/core';
+import { ActionIcon, Anchor, Box, Burger, Button, Center, Grid, Group, Menu, Modal, Stack, Switch, Text } from '@mantine/core';
+import { IconCoffee, IconSettings } from '@tabler/icons-react';
 
-import { useMediaQuery } from '@mantine/hooks';
-import {
-  IconMail,
-  IconCoffee,
-  IconSettings,
-} from '@tabler/icons-react';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import './App.css';
 import CountryForm from './CountryForm';
 import Results from './CountryResults';
 import GuessDistribution from './GuessDistribution';
 import InfoText from './InfoText';
+import SettingsProvider, { useSettings } from './SettingsProvider';
 import Share from './Share';
 import TitleLogo from './Title';
-import SettingsProvider, { useSettings } from './SettingsProvider';
 
 import {
+  correctContinent,
   correctCountry,
+  correctLandlocked,
+  correctPopulation,
+  correctReligion,
+  correctSurfaceArea,
+  correctTemperatureCelsius,
   dayNumber,
   getData,
-  correctContinent,
-  correctPopulation,
-  correctLandlocked,
-  correctReligion,
-  correctTemperatureCelsius,
-  correctSurfaceArea,
 } from './country';
 
 type CountryData = {
@@ -190,7 +174,7 @@ function LostMessage({ guessesData }: { guessesData: CountryData[] }) {
 function Main() {
   const [guessesData, setGuessesData] = useState<CountryData[]>([]);
   const [isWon, setIsWon] = useState(false);
-  const { hideHints } = useSettings();
+  const { tempFahrenheit, areaMiles } = useSettings();
 
   const TOTAL_GUESSES = 7;
   const guessesLeft = TOTAL_GUESSES - guessesData.length;
@@ -237,93 +221,139 @@ function Main() {
       </Text>
 
       {!isWon && !isLost && (
-        <CountryForm onSubmit={onSubmit} hideHints={hideHints} guessed={guessesData.map(({country}) => country)} />
+        <CountryForm onSubmit={onSubmit} guessed={guessesData.map(({country}) => country)} />
       )}
 
       {isWon && <WonMessage guessesData={guessesData} />}
       {isLost && <LostMessage guessesData={guessesData} />}
 
-      <Results guessesData={guessesData} correctData={correctData} />
+      <Results guessesData={guessesData} correctData={correctData} isTempFahrenheit={tempFahrenheit} isAreaMiles={areaMiles} />
 
       {guessesData.length === 0 && <InfoText />}
     </Stack>
   );
 }
 
-/* -------------------- Header / Settings -------------------- */
-
 function SettingsButton() {
   const [opened, setOpened] = useState(false);
-  const { hideHints, setHideHints } = useSettings();
 
   return (
     <>
       <ActionIcon variant="transparent" c="#002a4a" onClick={() => setOpened(true)} size="lg">
         <IconSettings />
       </ActionIcon>
+      <SettingsModal opened={opened} setOpened={setOpened} />
+    </>
+  );
+}
 
+function SettingsModal({ opened, setOpened }: { opened: boolean; setOpened: (open: boolean) => void }) {
+  const { tempFahrenheit, setTempFahrenheit, areaMiles, setAreaMiles } = useSettings();
+
+  return (
       <Modal opened={opened} onClose={() => setOpened(false)} title="Settings" centered>
         <Switch
-          checked={hideHints}
-          label="Hide hint information in search results"
-          onChange={(e) => setHideHints(e.currentTarget.checked)}
+          checked={tempFahrenheit}
+          label="Show temperatures in Fahrenheit"
+          onChange={(e) => setTempFahrenheit(e.currentTarget.checked)}
         />
-
+        <Switch
+          checked={areaMiles}
+          label="Show surface area in square miles"
+          onChange={(e) => setAreaMiles(e.currentTarget.checked)}
+          mt="md"
+        />
         <Group justify="right" mt="md">
           <Button variant="outline" onClick={() => setOpened(false)}>
             Close
           </Button>
         </Group>
       </Modal>
-    </>
   );
 }
 
 function Header() {
-  // const wide = useMediaQuery('(min-width: 630px)');
+  const isMobile = useMediaQuery(`(max-width: 600px)`);
+  const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
+  const [displaySettings, setDisplaySettings] = useState(false);
 
-  // return (
-  //   <Stack align="center" gap="md">
-  //     <Group justify={wide ? 'apart' : 'center'} w="85%">
-  //       {wide && <SettingsButton />}
-  //       <TitleLogo />
-  //       {wide && (
-  //         <Anchor href={`mailto:${atob('aGVsbG9AZ2VvZGxlLm1l')}`}>
-  //           <IconMail size={24} />
-  //         </Anchor>
-  //       )}
-  //     </Group>
-  //   </Stack>
-  // );
+  const kofiLink = (
+    <Anchor
+      style={{ cursor: 'pointer' }}
+      href="https://ko-fi.com/muhashi"
+      target="_blank"
+      underline="never"
+      title="Buy me a coffee <3"
+    >
+      <IconCoffee className="kofi-hover" />
+    </Anchor>
+  );
 
-  const isMobile = useMediaQuery(`(max-width: 485px)`);
-    // <div style={{ padding: '20px',  margin: '0 auto' }}>
+  const titleGroup = (
+    <Group justify="center" align="flex-end" gap="xs" style={{ marginBottom: '8px' }}>
+      {!isMobile && <Text style={{ visibility: 'hidden' }}>by muhashi</Text>}
+      <TitleLogo />
+      <Text fs="italic" c="dimmed">
+        by <Anchor c="blue" href="https://muhashi.com/" target="_blank" underline="always">muhashi</Anchor>
+      </Text>
+    </Group>
+  );
 
-  return (<header style={{ textAlign: 'center', marginBottom: '20px', maxWidth: '800px', }}>
-    <Grid justify="center" align="flex-end">
-      <Grid.Col span={1}>
-        <Anchor style={{ marginLeft: 'auto', cursor: 'pointer' }} href="https://ko-fi.com/muhashi" target="_blank" underline="never" title="Buy me a coffee <3">
-          <IconCoffee className="kofi-hover" />
-        </Anchor>
-      </Grid.Col>
-      <Grid.Col span={10}>
-        <Group justify="center" align="flex-end" gap="xs" style={{ marginBottom: '8px' }}>
-          <Text style={{visibility: 'hidden', display: isMobile ? 'none' : 'block'}}>by muhashi</Text>
-            <TitleLogo />
-          <Text fs="italic" c="dimmed">
-            by <Anchor c="blue" href="https://muhashi.com/" target="_blank" underline="always">muhashi</Anchor>
-          </Text>
-        </Group>
-      </Grid.Col>
-      <Grid.Col span={1}>
-        <SettingsButton />
-      </Grid.Col>
-    </Grid>
-  </header>);
+  return (
+    <>
+    <header style={{ textAlign: 'center', marginBottom: '20px', maxWidth: '100%', width: isMobile ? '100%' : 'auto' }}>
+      <Stack gap="xs" style={{ width: '100%' }}>
+        {isMobile && (
+          <Group justify="flex-end" pr="md" style={{ width: '100%' }}>
+            <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>
+              <Menu.Target>
+                <Burger opened={menuOpened} onClick={toggleMenu} size="sm" aria-label="Open menu" />
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconSettings size={16} />}
+                  onClick={() => {
+                    closeMenu();
+                    setDisplaySettings(true);
+                  }}
+                >
+                  Settings
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconCoffee size={16} />}
+                  component="a"
+                  href="https://ko-fi.com/muhashi"
+                  target="_blank"
+                  onClick={closeMenu}
+                >
+                  Donate
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
+        )}
 
+        <Grid justify="center" align="flex-end">
+          {!isMobile && (
+            <Grid.Col span={1}>
+              {kofiLink}
+            </Grid.Col>
+          )}
+          <Grid.Col span={isMobile ? 12 : 10}>
+            {titleGroup}
+          </Grid.Col>
+          {!isMobile && (
+            <Grid.Col span={1}>
+              <SettingsButton />
+            </Grid.Col>
+          )}
+        </Grid>
+      </Stack>
+    </header>
+    <SettingsModal opened={displaySettings} setOpened={setDisplaySettings} />
+    </>
+  );
 }
-
-/* -------------------- App -------------------- */
 
 export default function App() {
   return (

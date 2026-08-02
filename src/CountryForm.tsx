@@ -121,14 +121,13 @@ import wordlist from './wordlist';
 
 type CountryFormProps = {
   onSubmit: (country: string) => void;
-  hideHints: boolean;
   guessed: string[];
 };
 
 
-function CountryForm({ onSubmit, hideHints, guessed }: CountryFormProps) {
+function CountryForm({ onSubmit, guessed }: CountryFormProps) {
   const [country, setCountry] = useState('');
-  const isMobile = useMediaQuery(`(max-width: 485px)`);
+  const isMobile = useMediaQuery(`(max-width: 600px)`);
 
   const filter: OptionsFilter = ({options, search}) => {
     const clean = search.replace(/[^A-Za-z\s]/g, '').toLowerCase().trim();

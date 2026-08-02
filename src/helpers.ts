@@ -49,6 +49,10 @@ function formatPopulation(num: number): string {
   return parseFloat(scaledNum.toPrecision(3)) + suffix;
 }
 
+function km2ToMi2(km2: number): number {
+  return km2 / 2.59;
+}
+
 export {
-  isApproxEqual, getEmojiHintText, tempFahrenheit, formatPopulation,
+  isApproxEqual, getEmojiHintText, tempFahrenheit, formatPopulation, km2ToMi2,
 };

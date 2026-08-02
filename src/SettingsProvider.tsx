@@ -20,8 +20,10 @@ function useLocalStorageState<T>(key: string, defaultValue: T) {
 }
 
 type SettingsContextType = {
-  hideHints: boolean;
-  setHideHints: (v: boolean) => void;
+  tempFahrenheit: boolean;
+  setTempFahrenheit: (v: boolean) => void;
+  areaMiles: boolean;
+  setAreaMiles: (v: boolean) => void;
 };
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -34,14 +36,17 @@ export function useSettings() {
   return ctx;
 }
 
-const HIDE_HINTS_KEY = 'hideHints';
+const TEMP_FAHRENHEIT_KEY = 'tempFahrenheit';
+const AREA_MILES_KEY = 'areaMiles';
 
 export default function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [hideHints, setHideHints] =
-    useLocalStorageState<boolean>(HIDE_HINTS_KEY, false);
+  const [tempFahrenheit, setTempFahrenheit] =
+    useLocalStorageState<boolean>(TEMP_FAHRENHEIT_KEY, false);
+
+  const [areaMiles, setAreaMiles] = useLocalStorageState<boolean>(AREA_MILES_KEY, false);
 
   return (
-    <SettingsContext.Provider value={{ hideHints, setHideHints }}>
+    <SettingsContext.Provider value={{ tempFahrenheit, setTempFahrenheit, areaMiles, setAreaMiles }}>
       {children}
     </SettingsContext.Provider>
   );
