@@ -141,7 +141,7 @@ function formatCellValue(columnIndex: number, value: DemographicDataType): strin
     case 1: // Population
       return formatPopulation(value as number);
     case 2: // Landlocked
-      return value ? 'Landlocked' : 'Coastal';
+      return value ? 'Yes' : 'No';
     case 4: // Avg. Temp.
       return value === 0
         ? 'N/A'
@@ -192,7 +192,7 @@ function ResultCard({ background, textColor, children }: { background: string; t
 
 function HeaderCell({ label, tip }: { label: string; tip: string }) {
   return (
-    <Tooltip label={tip} withinPortal multiline w={220} openDelay={0}>
+    <Tooltip label={tip} withinPortal multiline w={220} events={{ hover: true, focus: true, touch: true }}>
       <Box
         h="100%"
         style={{
