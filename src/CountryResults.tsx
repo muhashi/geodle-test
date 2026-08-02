@@ -341,7 +341,7 @@ function MobileResults({
   isAreaMiles: boolean;
 }) {
   return (
-    <Box w="95%" maw="50rem" mx="auto" mb="10vh">
+    <Box w="95%" maw="50rem" mx="auto">
       <Box style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {[...guessesData].reverse().map((guessData) => (
           <MobileGuessCard key={guessData.country} guessData={guessData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />
@@ -370,7 +370,7 @@ function Results({
   }
 
   return (
-    <Box w="100%" maw="50rem" mx="auto" mb="10vh">
+    <Box w="100%" maw="50rem" mx="auto">
       <Grid columns={7} gutter={6} align="stretch" ml="0.3rem" mr="0.3rem">
         {/* Header row */}
         <Grid.Col span={1} style={colStyle}>

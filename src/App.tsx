@@ -213,7 +213,7 @@ function Main() {
   };
 
   return (
-    <Stack align="center" gap="xl">
+    <Stack align="center" gap="xl" mb="10vh">
       <Text ta="center" fw={500}>
         {(isWon || isLost)
           ? 'Come back tomorrow for a new country!'
