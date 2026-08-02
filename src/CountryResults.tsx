@@ -8,6 +8,7 @@ import { formatPopulation, getEmojiHintText, tempFahrenheit } from './helpers';
 const HINT_GREEN = '#6a9955';
 const HINT_RED = '#c15c4c';
 const HEADER_TEXT = '#000';
+const GUESS_CELL = '#FFF';
 
 type DemographicDataType = number | string | boolean;
 
@@ -28,7 +29,7 @@ type HintResult = 'correct' | 'up' | 'down' | 'wrong';
 // and only force a mid-word break as a last resort, rather than breaking
 // anywhere. `lang` is required for the hyphenation dictionary to kick in.
 const wrapStyle = {
-  wordBreak: 'break-word' as const,
+  wordBreak: 'normal' as const,
   overflowWrap: 'break-word' as const,
   hyphens: 'auto' as const,
   WebkitHyphens: 'auto' as const,
@@ -111,7 +112,7 @@ const COLUMNS: { label: string; icon: () => JSX.Element; tip: string }[] = [
   },
   { label: 'Religion', icon: IconBook, tip: 'Most common religion matches the correct country' },
   { label: 'Avg. Temp.', icon: IconThermometer, tip: 'Temperature within 10% of correct country' },
-  // { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
+  { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
 ];
 
 // Every Grid.Col needs minWidth: 0 -- flex items default to min-width: auto,
@@ -156,7 +157,7 @@ function formatCellValue(columnIndex: number, value: DemographicDataType): strin
 
 /* ---------------- Building blocks ---------------- */
 
-function ResultCard({ background, children }: { background: string; children: ReactNode }) {
+function ResultCard({ background, textColor, children }: { background: string; textColor?: string; children: ReactNode }) {
   return (
     <Box
       h="100%"
@@ -174,11 +175,11 @@ function ResultCard({ background, children }: { background: string; children: Re
     >
       <Text
         fw={700}
-        c="white"
+        c={textColor ?? "white"}
         ta="center"
         lang="en"
         style={{
-          fontSize: 'clamp(0.4rem, 1.95vw, 0.875rem)',
+          fontSize: 'clamp(0.4rem, 1.8vw, 0.875rem)',
           lineHeight: 1.15,
           ...wrapStyle,
         }}
@@ -189,9 +190,9 @@ function ResultCard({ background, children }: { background: string; children: Re
   );
 }
 
-function HeaderCell({ label, tip, icon: Icon }: { label: string; tip: string; icon: () => JSX.Element }) {
+function HeaderCell({ label, tip }: { label: string; tip: string }) {
   return (
-    <Tooltip label={tip} withinPortal multiline w={220}>
+    <Tooltip label={tip} withinPortal multiline w={220} openDelay={0}>
       <Box
         h="100%"
         style={{
@@ -228,7 +229,133 @@ function HeaderCell({ label, tip, icon: Icon }: { label: string; tip: string; ic
   );
 }
 
-/* ---------------- Main ---------------- */
+
+function MobileStatCard({
+  columnIndex,
+  hint,
+  displayValue,
+}: {
+  columnIndex: number;
+  hint: HintResult;
+  displayValue: string;
+}) {
+  const { label } = COLUMNS[columnIndex];
+
+  const sharedBoxStyle = {
+    // border: '2px solid #000',
+    borderRadius: 10,
+    padding: '6px 4px',
+    minHeight: 58,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  };
+
+  const isCorrect = hint === 'correct';
+  return (
+    <Box style={{ ...sharedBoxStyle, background: isCorrect ? HINT_GREEN : HINT_RED }}>
+      <Text
+        ta="center"
+        fw={600}
+        tt="uppercase"
+        lang="en"
+        style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.85)', ...wrapStyle }}
+      >
+        {label}
+      </Text>
+      <Text fw={700} c="white" ta="center" lang="en" style={{ fontSize: '0.78rem', ...wrapStyle }}>
+          {displayValue}
+          {hint === 'up' && ' ↑'}
+          {hint === 'down' && ' ↓'}
+      </Text>
+    </Box>
+  );
+}
+
+function MobileGuessCard({
+  guessData,
+  correctData,
+}: {
+  guessData: CountryData;
+  correctData: CountryData;
+}) {
+  const isCorrectGuess = guessData.country === correctData.country;
+
+  const guessValues: DemographicDataType[] = [
+    guessData.continent,
+    guessData.population,
+    guessData.landlocked,
+    guessData.religion,
+    guessData.temperatureCelsius,
+    guessData.surfaceArea,
+  ];
+  const correctValues: DemographicDataType[] = [
+    correctData.continent,
+    correctData.population,
+    correctData.landlocked,
+    correctData.religion,
+    correctData.temperatureCelsius,
+    correctData.surfaceArea,
+  ];
+
+  return (
+    <Box
+      style={{
+        background: '#fff',
+        border: '2px solid #c4c4c4',
+        borderRadius: 16,
+        padding: '10px 12px 12px',
+      }}
+    >
+      <Text
+        fw={800}
+        lang="en"
+        style={{
+          fontSize: '1.1rem',
+          display: 'inline-block',
+          ...(isCorrectGuess ? { background: '#cfe3fb', padding: '1px 8px', borderRadius: 6 } : {}),
+          ...wrapStyle,
+        }}
+      >
+        {guessData.country}
+      </Text>
+
+      <Grid columns={3} gutter={6} mt={8}>
+        {COLUMNS.map(({label}, columnIndex) => {
+          const hint = getHintResult(correctValues[columnIndex], guessValues[columnIndex]);
+          const displayValue = formatCellValue(columnIndex, guessValues[columnIndex]);
+
+          return (
+            <Grid.Col span={1} key={label} style={colStyle}>
+              <MobileStatCard columnIndex={columnIndex} hint={hint} displayValue={displayValue} />
+            </Grid.Col>
+          );
+        })}
+      </Grid>
+    </Box>
+  );
+}
+
+function MobileResults({
+  guessesData,
+  correctData,
+}: {
+  guessesData: CountryData[];
+  correctData: CountryData;
+}) {
+  return (
+    <Box w="95%" maw="50rem" mx="auto" mb="10vh">
+      <Box style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {[...guessesData].reverse().map((guessData) => (
+          <MobileGuessCard key={guessData.country} guessData={guessData} correctData={correctData} />
+        ))}
+      </Box>
+    </Box>
+  );
+}
 
 function Results({
   guessesData,
@@ -238,11 +365,15 @@ function Results({
   correctData: CountryData;
 }) {
   if (guessesData.length === 0) return null;
-  const matches = useMediaQuery('(min-width: 370px)');
+  const matches = useMediaQuery('(min-width: 600px)');
+
+  if (!matches) {
+    return <MobileResults guessesData={guessesData} correctData={correctData} />;
+  }
 
   return (
     <Box w="100%" maw="50rem" mx="auto" mb="10vh">
-      <Grid columns={6} gutter={matches ? 6 : 1} align="stretch" ml="0.3rem" mr="0.3rem">
+      <Grid columns={7} gutter={6} align="stretch" ml="0.3rem" mr="0.3rem">
         {/* Header row */}
         <Grid.Col span={1} style={colStyle}>
           <Box
@@ -284,7 +415,7 @@ function Results({
             guessData.landlocked,
             guessData.religion,
             guessData.temperatureCelsius,
-            // guessData.surfaceArea,
+            guessData.surfaceArea,
           ];
           const correctValues: DemographicDataType[] = [
             correctData.continent,
@@ -292,14 +423,14 @@ function Results({
             correctData.landlocked,
             correctData.religion,
             correctData.temperatureCelsius,
-            // correctData.surfaceArea,
+            correctData.surfaceArea,
           ];
           const isCorrectGuess = guessData.country === correctData.country;
 
           return (
             <Fragment key={guessData.country}>
               <Grid.Col span={1} style={colStyle}>
-                <ResultCard background={isCorrectGuess ? HINT_GREEN : HINT_RED}>
+                <ResultCard background={isCorrectGuess ? HINT_GREEN : HINT_RED} border="none">
                   {guessData.country}
                 </ResultCard>
               </Grid.Col>
