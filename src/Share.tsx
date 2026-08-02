@@ -2,10 +2,10 @@ import { Button } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import {
   correctContinent,
-  correctSurfaceArea,
   correctLandlocked,
   correctPopulation,
   correctReligion,
+  correctSurfaceArea,
   correctTemperatureCelsius,
   dayNumber,
 } from './country.ts';

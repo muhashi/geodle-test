@@ -1,4 +1,4 @@
-import { Box, Stack, Group, Text } from '@mantine/core';
+import { Box, Group, Stack, Text } from '@mantine/core';
 
 type GuessDistributionProps = {
   distribution: number[];

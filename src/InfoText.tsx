@@ -1,4 +1,4 @@
-import { Box, Stack, Group, Text, Title, Image } from '@mantine/core';
+import { Box, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
 import CountryResults from './CountryResults.tsx';
 
