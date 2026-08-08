@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-blast';
 
-import { ActionIcon, Anchor, Box, Burger, Button, Center, Grid, Group, Menu, Modal, Stack, Switch, Text } from '@mantine/core';
+import { Anchor, AppShell, Box, Burger, Button, Center, Grid, Group, Menu, Modal, Stack, Switch, Text } from '@mantine/core';
 import { IconCoffee, IconSettings } from '@tabler/icons-react';
 
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
@@ -137,8 +137,6 @@ function GameStatisticsModal({
   );
 }
 
-/* -------------------- Win / Lose messages -------------------- */
-
 function WonMessage({ guessesData }: { guessesData: CountryData[] }) {
   return (
     <>
@@ -234,19 +232,6 @@ function Main() {
   );
 }
 
-function SettingsButton() {
-  const [opened, setOpened] = useState(false);
-
-  return (
-    <>
-      <ActionIcon variant="transparent" c="#002a4a" onClick={() => setOpened(true)} size="lg">
-        <IconSettings />
-      </ActionIcon>
-      <SettingsModal opened={opened} setOpened={setOpened} />
-    </>
-  );
-}
-
 function SettingsModal({ opened, setOpened }: { opened: boolean; setOpened: (open: boolean) => void }) {
   const { tempFahrenheit, setTempFahrenheit, areaMiles, setAreaMiles } = useSettings();
 
@@ -277,37 +262,27 @@ function Header() {
   const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
   const [displaySettings, setDisplaySettings] = useState(false);
 
-  const kofiLink = (
-    <Anchor
-      style={{ cursor: 'pointer' }}
-      href="https://ko-fi.com/muhashi"
-      target="_blank"
-      underline="never"
-      title="Buy me a coffee <3"
-    >
-      <IconCoffee className="kofi-hover" />
-    </Anchor>
-  );
-
   const titleGroup = (
-    <Group justify="center" align="flex-end" gap="xs" style={{ marginBottom: '8px' }}>
-      {!isMobile && <Text style={{ visibility: 'hidden' }}>by muhashi</Text>}
+    <Group justify="center" align="flex-end" gap="xs">
       <TitleLogo />
-      <Text fs="italic" c="dimmed">
-        by <Anchor c="blue" href="https://muhashi.com/" target="_blank" underline="always">muhashi</Anchor>
-      </Text>
     </Group>
   );
 
   return (
     <>
     <header style={{ textAlign: 'center', marginBottom: '20px', maxWidth: '100%', width: isMobile ? '100%' : 'auto' }}>
-      <Stack gap="xs" style={{ width: '100%' }}>
-        {isMobile && (
+      <Grid justify="center" align="center">
+        <Grid.Col span={1} p={0}>
+          {/* empty to center */}
+        </Grid.Col>
+        <Grid.Col span={10} p={0}>
+          {titleGroup}
+        </Grid.Col>
+        <Grid.Col span={1} p={0} pr="lg">
           <Group justify="flex-end" pr="md" style={{ width: '100%' }}>
-            <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>
+            <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-start" withArrow>
               <Menu.Target>
-                <Burger opened={menuOpened} onClick={toggleMenu} size="sm" aria-label="Open menu" />
+                <Burger opened={menuOpened} onClick={toggleMenu} size="md" aria-label="Open menu" />
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item
@@ -331,24 +306,8 @@ function Header() {
               </Menu.Dropdown>
             </Menu>
           </Group>
-        )}
-
-        <Grid justify="center" align="flex-end">
-          {!isMobile && (
-            <Grid.Col span={1}>
-              {kofiLink}
-            </Grid.Col>
-          )}
-          <Grid.Col span={isMobile ? 12 : 10}>
-            {titleGroup}
-          </Grid.Col>
-          {!isMobile && (
-            <Grid.Col span={1}>
-              <SettingsButton />
-            </Grid.Col>
-          )}
-        </Grid>
-      </Stack>
+        </Grid.Col>
+      </Grid>
     </header>
     <SettingsModal opened={displaySettings} setOpened={setDisplaySettings} />
     </>
@@ -357,11 +316,13 @@ function Header() {
 
 export default function App() {
   return (
-    <SettingsProvider>
-      <Stack mih="95vh" align="center" pt="md">
-        <Header />
-        <Main />
-      </Stack>
-    </SettingsProvider>
+    <div className="App">
+      <SettingsProvider>
+        <AppShell header={{ height: 85 }} padding="md">
+          <AppShell.Header className="header"><Header /></AppShell.Header>
+          <AppShell.Main><Main /></AppShell.Main>
+        </AppShell>
+      </SettingsProvider>
+    </div>
   );
 }

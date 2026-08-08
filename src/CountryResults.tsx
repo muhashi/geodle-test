@@ -5,10 +5,9 @@ import { useMediaQuery } from '@mantine/hooks';
 import { formatPopulation, getEmojiHintText, tempFahrenheit, km2ToMi2 } from './helpers';
 
 
-const HINT_GREEN = '#6a9955';
-const HINT_RED = '#c15c4c';
+const HINT_GREEN = '#2FA66D';
+const HINT_RED = '#DD5652';
 const HEADER_TEXT = '#000';
-const GUESS_CELL = '#FFF';
 
 type DemographicDataType = number | string | boolean;
 
@@ -104,7 +103,7 @@ const COLUMNS: { label: string; icon: () => JSX.Element; tip: string }[] = [
   },
   { label: 'Religion', icon: IconBook, tip: 'Most common religion matches the correct country' },
   { label: 'Avg. Temp.', icon: IconThermometer, tip: 'Temperature within 10% of correct country' },
-  { label: 'Surface Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
+  { label: 'Area', icon: IconBuilding, tip: 'Surface area within 10% of correct country' },
 ];
 
 const colStyle = { minWidth: 0 };
