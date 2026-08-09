@@ -13,7 +13,7 @@ type CountryFormProps = {
 
 
 function CountryForm({ onSubmit, guessed }: CountryFormProps) {
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState<string | null>(null);
   const isMobile = useMediaQuery(`(max-width: 600px)`);
 
   const filter: OptionsFilter = ({options, search}) => {
@@ -31,7 +31,7 @@ function CountryForm({ onSubmit, guessed }: CountryFormProps) {
   };
 
   return (
-    <form style={{ width: '100%' }} onSubmit={(e) => { e.preventDefault(); onSubmit(country); setCountry(null);}}>
+    <form style={{ width: '100%' }} onSubmit={(e) => { e.preventDefault(); onSubmit(country ?? ''); setCountry(null);}}>
       <Group style={{ width: '100%' }} gap="sm" wrap="nowrap" justify="center">
         <Button size="md" variant="contained" type="submit" style={{visibility: 'hidden', display: isMobile ? 'none' : 'block'}} disabled>Guess</Button> {/* hidden button for centering */}
         <Select
