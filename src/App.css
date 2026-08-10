@@ -1,13 +1,4 @@
-.App {
-  background-color: #F7F6F4;
-  /* min-height: 100vh;
-  width: 100%;
-  display: block;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  overflow: auto; */
-}
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@200..1000&display=swap');
 
 /** Title animation from https://codepen.io/arlinacode/pen/BxgRPb, licence below:
   Copyright (c) 2023 by Arlina Code (https://codepen.io/arlinacode/pen/BxgRPb)
@@ -25,22 +16,20 @@
   margin: auto;
   display: block;
   text-align: center;
+  font-style: italic;
 }
 
 .title-text span {
-  --shadow-color: #0A2E27;
+  /* --shadow-color: #0A2E27; */
   position: relative;
   top: 10px;
   display: inline-block;
   animation: bounce 0.3s ease 6 alternate;
   font-size: 50px;
-  color: #1FAE83;
-  text-shadow: 0 1px 0 var(--shadow-color), 0 2px 0 var(--shadow-color), 0 3px 0 var(--shadow-color), 0 4px 0 var(--shadow-color),
-    0 5px 0 var(--shadow-color), 0 6px 0 transparent, 0 7px 0 transparent, 0 8px 0 transparent;
-}
-
-.header {
-  background-color: #F7F6F4;
+  color: var(--mantine-color-ink-6);
+  font-weight: 1000;
+  /* text-shadow: 0 1px 0 var(--shadow-color), 0 2px 0 var(--shadow-color), 0 3px 0 var(--shadow-color), 0 4px 0 var(--shadow-color),
+    0 5px 0 var(--shadow-color), 0 6px 0 transparent, 0 7px 0 transparent, 0 8px 0 transparent; */
 }
 
 .title-text span:nth-child(2) {
@@ -116,4 +105,12 @@
 		90% {
 			color: rgba(251, 7, 217, 1);
 		}
+}
+
+.home-action-card {
+  transition: transform 0.05s ease-in-out;
+}
+
+.home-action-card:hover {
+  transform: scale(1.02);
 }
