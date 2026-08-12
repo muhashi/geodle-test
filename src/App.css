@@ -114,3 +114,7 @@
 .home-action-card:hover {
   transform: scale(1.02);
 }
+
+.settings-switch[data-checked="false"] .mantine-Switch-track {
+  background-color: var(--mantine-color-gray-5);
+}

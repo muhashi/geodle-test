@@ -41,7 +41,7 @@ function CountryForm({ onSubmit, guessed }: CountryFormProps) {
           clearable
           filter={filter}
           withCheckIcon={false}
-          rightSection={null}
+          rightSection={' '}
           comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 }, shadow: 'md' }}
           placeholder="Search a country..."
           onChange={(_value, option) => setCountry(option?.value)}

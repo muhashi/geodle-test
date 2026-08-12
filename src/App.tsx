@@ -15,10 +15,12 @@ import { useDisclosure } from '@mantine/hooks';
 import './App.css';
 import CountryForm from './CountryForm';
 import Results from './CountryResults';
+import { Footer, PrivacyPage, TermsPage } from './Footer';
 import GuessDistribution from './GuessDistribution';
 import InfoText from './InfoText';
 import SettingsProvider, { useSettings } from './SettingsProvider';
 import Share from './Share';
+import Stamp from './Stamp';
 import TitleLogo from './Title';
 import wordlist from './wordlist';
 
@@ -66,15 +68,18 @@ function VerticalText({ top, bottom }: { top: string | number; bottom: string })
   );
 }
 
-// A centered item with a second item pinned to the right — used for the
-// header (logo + menu) and the game screen's badge + info-icon row.
-function CenterRow({ children, side }: { children: ReactNode; side?: ReactNode }) {
+function CenterRow({ children, left, right }: { children: ReactNode; left?: ReactNode; right?: ReactNode }) {
   return (
     <Box pos="relative" w="100%">
       <Center>{children}</Center>
-      {side && (
+      {left && (
+        <Box pos="absolute" top="50%" left={0} style={{ transform: 'translateY(-50%)' }}>
+          {left}
+        </Box>
+      )}
+      {right && (
         <Box pos="absolute" top="50%" right={0} style={{ transform: 'translateY(-50%)' }}>
-          {side}
+          {right}
         </Box>
       )}
     </Box>
@@ -91,10 +96,6 @@ function pickRandomCountryData(): CountryData {
   data.country = name;
   return data;
 }
-
-// ---------------------------------------------------------------------------
-// Post-game statistics + share + navigation
-// ---------------------------------------------------------------------------
 
 type Statistics = {
   won: number;
@@ -215,42 +216,15 @@ function CompletionStamp({
   isWon: boolean;
   guessCount: number;
 }) {
-  const color = isWon ? 'green' : 'red';
-
   return (
     <Box
       style={{
         width: 220,
         height: 220,
-        borderRadius: '50%',
-        border: `1px dashed var(--mantine-color-${color}-5)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         padding: 12,
       }}
     >
-      <Stack
-        align="center"
-        justify="center"
-        gap={4}
-        style={{
-          width: '100%',
-          height: '100%',
-          borderRadius: '50%',
-          border: `2px solid var(--mantine-color-${color}-6)`,
-        }}
-      >
-        <Text size="xs" fw={700} tt="uppercase" c={color} style={{ letterSpacing: 1 }}>
-          {country}
-        </Text>
-        <Text size="xl" fw={700} c={color}>
-          {isWon ? 'Found' : 'Missed'}
-        </Text>
-        <Text size="xs" fw={600} tt="uppercase" c={color} style={{ letterSpacing: 1 }}>
-          {isWon ? `In ${guessCount} guess${guessCount === 1 ? '' : 'es'}` : 'Better luck tomorrow'}
-        </Text>
-      </Stack>
+      <Stamp country={country} isWon={isWon} guessCount={guessCount} />
     </Box>
   );
 }
@@ -336,15 +310,14 @@ function GamePage({
 
   return (
     <Stack align="center" gap="xl" mb="10vh">
-      <CenterRow side={<InfoModal />}>
-        <Badge>{mode === 'daily' ? `Daily · No. ${dayNumber}` : 'Random'}</Badge>
-      </CenterRow>
-
-      <Text ta="center" fw={500}>
-        {isDone
-          ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Nice! Ready for another one?')
-          : <>Guess the country. <strong>{guessesLeft} guesses left.</strong></>}
-      </Text>
+      <Group gap="xs" justify="center" wrap="nowrap">
+        <Text ta="center" fw={500}>
+          {isDone
+            ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Nice! Ready for another one?')
+            : <>Guess the country. <strong>{guessesLeft} guesses left.</strong></>}
+        </Text>
+        {!isDone && <InfoModal />}
+      </Group>
 
       {!isDone && (
         <CountryForm onSubmit={onSubmit} guessed={guessesData.map(({ country }) => country)} />
@@ -387,32 +360,6 @@ function GamePage({
 // Homepage + footer + static pages
 // ---------------------------------------------------------------------------
 
-function Footer({
-  onAbout,
-  onTerms,
-  onPrivacy,
-}: {
-  onAbout: () => void;
-  onTerms: () => void;
-  onPrivacy: () => void;
-}) {
-  return (
-    <Group justify="center" gap="xs" mt="xl" pb="md">
-      <Anchor component="button" type="button" size="sm" c="dimmed" onClick={onAbout}>
-        About
-      </Anchor>
-      <Text c="dimmed" size="sm">&middot;</Text>
-      <Anchor component="button" type="button" size="sm" c="dimmed" onClick={onTerms}>
-        Terms of Service
-      </Anchor>
-      <Text c="dimmed" size="sm">&middot;</Text>
-      <Anchor component="button" type="button" size="sm" c="dimmed" onClick={onPrivacy}>
-        Privacy Policy
-      </Anchor>
-    </Group>
-  );
-}
-
 function HomeActionCard({
   title,
   subtitle,
@@ -428,7 +375,7 @@ function HomeActionCard({
     <UnstyledButton
       onClick={onClick}
       className="home-action-card"
-      p="lg"
+      p="sm"
       style={{
         flex: 1,
         minWidth: 180,
@@ -442,7 +389,7 @@ function HomeActionCard({
       <Text fw={700} fz="lg" c={emphasized ? 'white' : 'ink'}>
         {title}
       </Text>
-      <Text fz="sm" c={emphasized ? 'ink.1' : 'dimmed'}>
+      <Text fz="xs" c={emphasized ? 'ink.1' : 'dimmed'}>
         {subtitle}
       </Text>
     </UnstyledButton>
@@ -452,13 +399,11 @@ function HomeActionCard({
 function HomePage({
   onDaily,
   onRandom,
-  onAbout,
   onTerms,
   onPrivacy,
 }: {
   onDaily: () => void;
   onRandom: () => void;
-  onAbout: () => void;
   onTerms: () => void;
   onPrivacy: () => void;
 }) {
@@ -470,84 +415,13 @@ function HomePage({
         </Text>
 
         <Group mt="md" w="100%" wrap="nowrap">
-          <HomeActionCard title="Daily" subtitle="New country every day" onClick={onDaily} emphasized />
-          <HomeActionCard title="Random" subtitle="Practice anytime" onClick={onRandom} />
+          <HomeActionCard title="Daily" subtitle="New country every day!" onClick={onDaily} emphasized />
+          <HomeActionCard title="Quick Play" subtitle="Unlimited practice!" onClick={onRandom} />
         </Group>
       </Stack>
 
-      <Footer onAbout={onAbout} onTerms={onTerms} onPrivacy={onPrivacy} />
+      <Footer onTerms={onTerms} onPrivacy={onPrivacy} />
     </Stack>
-  );
-}
-
-function StaticPage({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
-  return (
-    <Stack mx="auto" gap="md" py="xl" style={{ maxWidth: 640 }}>
-      <Anchor component="button" type="button" size="sm" onClick={onBack} style={{ alignSelf: 'flex-start' }}>
-        &larr; Back to home
-      </Anchor>
-      <Paper p="lg">
-        <Stack gap="md">
-          <Text fz="xl" fw={700}>{title}</Text>
-          <Stack gap="sm">{children}</Stack>
-        </Stack>
-      </Paper>
-    </Stack>
-  );
-}
-
-function AboutPage({ onBack }: { onBack: () => void }) {
-  return (
-    <StaticPage title="About Geodle" onBack={onBack}>
-      <Text>
-        Geodle is a daily geography game. Every day there&apos;s a new secret country, and you
-        have seven guesses to find it. After each guess you&apos;ll see how your pick compares
-        across continent, population, religion, average temperature, and more.
-      </Text>
-      <Text>
-        Prefer not to wait for tomorrow&apos;s puzzle? Choose Random from the home screen to play
-        against a freshly picked country any time.
-      </Text>
-    </StaticPage>
-  );
-}
-
-function TermsPage({ onBack }: { onBack: () => void }) {
-  return (
-    <StaticPage title="Terms of Service" onBack={onBack}>
-      <Text>
-        Geodle is provided free of charge, as-is and without warranty of any kind. We do our best
-        to keep the daily puzzle and underlying country data accurate, but we can&apos;t guarantee
-        the site will always be error-free or available without interruption.
-      </Text>
-      <Text>
-        By using this site you agree not to misuse it — for example, by attempting to disrupt the
-        service or scrape it in a way that affects other players. Continued use of the site after
-        changes to these terms means you accept the updated terms.
-      </Text>
-      <Text c="dimmed" size="sm">
-        Placeholder copy — replace with your actual terms before launch.
-      </Text>
-    </StaticPage>
-  );
-}
-
-function PrivacyPage({ onBack }: { onBack: () => void }) {
-  return (
-    <StaticPage title="Privacy Policy" onBack={onBack}>
-      <Text>
-        Geodle stores your game progress, statistics, and preferences locally in cookies on your
-        device so your streak and settings persist between visits. This data isn&apos;t sent to
-        any server or shared with third parties.
-      </Text>
-      <Text>
-        We don&apos;t collect personal information, and we don&apos;t run ads or trackers on this
-        site.
-      </Text>
-      <Text c="dimmed" size="sm">
-        Placeholder copy — replace with your actual privacy policy before launch.
-      </Text>
-    </StaticPage>
   );
 }
 
@@ -557,29 +431,26 @@ function SettingsModal({ opened, setOpened }: { opened: boolean; setOpened: (ope
   return (
       <Modal opened={opened} onClose={() => setOpened(false)} title="Settings" centered>
         <Switch
+          className="settings-switch"
           checked={tempFahrenheit}
           label="Show temperatures in Fahrenheit"
           onChange={(e) => setTempFahrenheit(e.currentTarget.checked)}
         />
         <Switch
+          className="settings-switch"
           checked={areaMiles}
           label="Show surface area in square miles"
           onChange={(e) => setAreaMiles(e.currentTarget.checked)}
           mt="md"
         />
         <Group justify="right" mt="md">
-          <Button variant="outline" onClick={() => setOpened(false)}>
+          <Button variant="filled" onClick={() => setOpened(false)}>
             Close
           </Button>
         </Group>
       </Modal>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Header (logo, always visible + clickable home; menu: settings, dark mode,
-// email, github, donate)
-// ---------------------------------------------------------------------------
 
 function DarkModeMenuItem() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
@@ -603,61 +474,65 @@ function LogoButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Header({ onLogoClick }: { onLogoClick: () => void }) {
+function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode | null }) {
   const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
   const [displaySettings, setDisplaySettings] = useState(false);
+
+  const badge = mode && (
+    <Badge>{mode === 'daily' ? `Daily · No. ${dayNumber}` : 'Random'}</Badge>
+  );
+
+  const menu = (
+    <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>
+      <Menu.Target>
+        <Burger opened={menuOpened} onClick={toggleMenu} size="md" aria-label="Open menu" />
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Item
+          leftSection={<IconSettings size={16} />}
+          onClick={() => {
+            closeMenu();
+            setDisplaySettings(true);
+          }}
+        >
+          Settings
+        </Menu.Item>
+        <DarkModeMenuItem />
+        <Menu.Divider />
+        <Menu.Item
+          leftSection={<IconMail size={16} />}
+          component="a"
+          href={`mailto:${CONTACT_EMAIL}`}
+          onClick={closeMenu}
+        >
+          Email
+        </Menu.Item>
+        <Menu.Item
+          leftSection={<IconBrandGithub size={16} />}
+          component="a"
+          href={GITHUB_URL}
+          target="_blank"
+          onClick={closeMenu}
+        >
+          GitHub
+        </Menu.Item>
+        <Menu.Item
+          leftSection={<IconCoffee size={16} />}
+          component="a"
+          href="https://ko-fi.com/muhashi"
+          target="_blank"
+          onClick={closeMenu}
+        >
+          Donate
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
 
   return (
     <>
       <Box component="header" className="header" py="md">
-        <CenterRow
-          side={(
-            <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>
-              <Menu.Target>
-                <Burger opened={menuOpened} onClick={toggleMenu} size="md" aria-label="Open menu" />
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={<IconSettings size={16} />}
-                  onClick={() => {
-                    closeMenu();
-                    setDisplaySettings(true);
-                  }}
-                >
-                  Settings
-                </Menu.Item>
-                <DarkModeMenuItem />
-                <Menu.Divider />
-                <Menu.Item
-                  leftSection={<IconMail size={16} />}
-                  component="a"
-                  href={`mailto:${CONTACT_EMAIL}`}
-                  onClick={closeMenu}
-                >
-                  Email
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconBrandGithub size={16} />}
-                  component="a"
-                  href={GITHUB_URL}
-                  target="_blank"
-                  onClick={closeMenu}
-                >
-                  GitHub
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconCoffee size={16} />}
-                  component="a"
-                  href="https://ko-fi.com/muhashi"
-                  target="_blank"
-                  onClick={closeMenu}
-                >
-                  Donate
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          )}
-        >
+        <CenterRow left={badge} right={menu}>
           <LogoButton onClick={onLogoClick} />
         </CenterRow>
       </Box>
@@ -698,7 +573,6 @@ function Content({
         <HomePage
           onDaily={() => setView('daily')}
           onRandom={goRandom}
-          onAbout={() => setView('about')}
           onTerms={() => setView('terms')}
           onPrivacy={() => setView('privacy')}
         />
@@ -718,6 +592,8 @@ export default function App() {
     setView('random');
   };
 
+  const headerMode: GameMode | null = view === 'daily' || view === 'random' ? view : null;
+
   return (
     <Box
       className="App"
@@ -730,7 +606,7 @@ export default function App() {
     >
       <SettingsProvider>
         <Container size="sm" px="md" py="md">
-          <Header onLogoClick={goHome} />
+          <Header onLogoClick={goHome} mode={headerMode} />
           <Content view={view} setView={setView} randomSeed={randomSeed} goHome={goHome} goRandom={goRandom} />
         </Container>
       </SettingsProvider>

@@ -1,5 +1,11 @@
 import {
-  ActionIcon, Badge, Button, createTheme, Modal, Paper, Text,
+    ActionIcon,
+    Badge,
+    Button,
+    createTheme,
+    Modal,
+    Paper,
+    Text,
 } from '@mantine/core';
 
 declare module '@mantine/core' {
@@ -78,6 +84,11 @@ export const theme = createTheme({
         color: 'ink',
         radius: 'xl',
       },
+      styles: {
+        root: {
+            userSelect: 'none',
+        },
+      },
     }),
     Button: Button.extend({
       defaultProps: {
@@ -103,6 +114,7 @@ export const theme = createTheme({
     Text: Text.extend({
       defaultProps: {
         color: 'ink.6',
+        fw: 500,
       },
     }),
   },
