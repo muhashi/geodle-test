@@ -541,7 +541,7 @@ function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode
   );
 }
 
-type View = 'home' | 'daily' | 'random' | 'about' | 'terms' | 'privacy';
+type View = 'home' | 'daily' | 'random' | 'terms' | 'privacy';
 
 function Content({
   view,
@@ -561,8 +561,6 @@ function Content({
       return <GamePage mode="daily" onHome={goHome} onRandom={goRandom} />;
     case 'random':
       return <GamePage key={randomSeed} mode="random" onHome={goHome} onRandom={goRandom} />;
-    case 'about':
-      return <AboutPage onBack={goHome} />;
     case 'terms':
       return <TermsPage onBack={goHome} />;
     case 'privacy':

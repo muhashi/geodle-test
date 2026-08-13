@@ -1,6 +1,7 @@
 import {
     Anchor, Group, Paper, Stack, Text,
 } from '@mantine/core';
+import { ReactNode } from 'react';
 
 
 export function Footer({
