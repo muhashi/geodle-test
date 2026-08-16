@@ -355,16 +355,18 @@ function Results({
   correctData,
   isTempFahrenheit,
   isAreaMiles,
+  isMobile = false,
 }: {
   guessesData: CountryData[];
   correctData: CountryData;
   isTempFahrenheit: boolean;
   isAreaMiles: boolean;
+  isMobile?: boolean;
 }) {
   if (guessesData.length === 0) return null;
   const matches = useMediaQuery('(min-width: 600px)');
 
-  if (!matches) {
+  if (!matches || isMobile) {
     return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
   }
 

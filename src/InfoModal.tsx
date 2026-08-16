@@ -1,37 +1,53 @@
-import { Box, Group, Image, Stack, Text, Title } from '@mantine/core';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { ActionIcon, Box, Group, Modal, Stack, Text, Title } from '@mantine/core';
+import { IconHelpCircle, IconInfoCircle } from '@tabler/icons-react';
+import { useState } from 'react';
 import CountryResults from './CountryResults.tsx';
-
-import svgSquareCaretUp from './img/square-caret-up.svg';
-import svgSquareGreen from './img/square-green.svg';
-import svgSquareRed from './img/square-red.svg';
 
 const squareStyle = {
   width: '1rem',
   height: '1rem',
-  padding: '0 0.5rem',
+  display: 'inline-block',
+  margin: '0 0 0 0.5rem',
 };
 
 const squareRedImg = (
-  <Image src={svgSquareRed} alt="Red Square" style={squareStyle} />
+  <Box bg="red" style={squareStyle} />
 );
 
 const squareGreenImg = (
-  <Image src={svgSquareGreen} alt="Green Square" style={squareStyle} />
+  <Box bg="green" style={squareStyle} />
 );
 
-const upwardsArrowImg = (
-  <Image src={svgSquareCaretUp} alt="Upwards Arrow" style={squareStyle} />
-);
+export default function InfoModal() {
+  const [opened, setOpened] = useState(false);
+
+  return (
+    <>
+      <ActionIcon
+        variant="subtle"
+        color="gray"
+        aria-label="How to play"
+        onClick={() => setOpened(true)}
+      >
+        <IconHelpCircle size={20} />
+      </ActionIcon>
+
+      <Modal opened={opened} onClose={() => setOpened(false)} centered>
+        <InfoText />
+      </Modal>
+    </>
+  );
+}
 
 function InfoText() {
   return (
     <>
       <Stack
         gap="md"
-        p="xl"
-        pb="0"
-        w="75%"
+        p="0"
+        pr="sm"
+        pl="sm"
+        w="100%"
       >
         <Group justify="center" gap="xs">
           <IconInfoCircle size={22} />
@@ -45,17 +61,8 @@ function InfoText() {
         </Text>
 
         <Text>
-          Each guess must be a country that appears in the search box.
-        </Text>
-
-        <Text>
-          After each guess, you will get a hint about how different your guess
-          is from the correct country.
-        </Text>
-
-        <Text>
-          You are given hints about the following categories: Continent,
-          Population, Landlocked, Religion, Temperature, and Surface Area.
+          After each guess, you will get a hint about how the demographics
+          of your guess compare to the secret country.
         </Text>
 
         <Text>
@@ -87,14 +94,17 @@ function InfoText() {
           }}
           isTempFahrenheit={false}
           isAreaMiles={false}
+          isMobile={true}
         />
       </Box>
 
       <Stack
         gap="md"
-        p="xl"
-        pt="0"
-        w="75%"
+        p="0"
+        pt="lg"
+        pr="sm"
+        pl="sm"
+        w="100%"
       >
         <Text>
           You guess Australia, but it&apos;s in the wrong continent from the
@@ -110,20 +120,14 @@ function InfoText() {
 
         <Text>
           Landlocked refers to whether the country is surrounded by land.
-          Australia is not landlocked, as it is surrounded by ocean, so it is
-          coastal. Both countries have the same landlocked status – they are
-          both coastal, so it shows
-          {squareGreenImg}
+          Australia is surrounded by ocean, so it is not landlocked. Both countries have the same landlocked status - they are
+          both coastal, so it shows {squareGreenImg}
         </Text>
 
         <Text>
           The average temperature of the correct country is at least 10% higher
           than Australia&apos;s, so it shows
-          {upwardsArrowImg}
-        </Text>
-
-        <Text>
-          Hover over the category titles to get more information on what it means.
+          {squareRedImg}
         </Text>
 
         <Text>
@@ -133,5 +137,3 @@ function InfoText() {
     </>
   );
 }
-
-export default InfoText;

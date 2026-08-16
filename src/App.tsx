@@ -3,11 +3,11 @@ import { useEffect, useState, type ReactNode } from 'react';
 import ConfettiExplosion from 'react-confetti-blast';
 
 import {
-  ActionIcon, Anchor, Badge, Box, Burger, Button, Center, Container, Group, Menu, Modal, Paper,
+  Anchor, Badge, Box, Burger, Button, Center, Container, Group, Menu, Modal, Paper,
   Stack, Switch, Text, UnstyledButton, useMantineColorScheme, useMantineTheme,
 } from '@mantine/core';
 import {
-  IconBrandGithub, IconCoffee, IconHelpCircle, IconMail, IconMoon, IconSettings, IconSun,
+  IconBrandGithub, IconCoffee, IconMail, IconMoon, IconSettings, IconSun,
 } from '@tabler/icons-react';
 
 import { useDisclosure } from '@mantine/hooks';
@@ -17,7 +17,7 @@ import CountryForm from './CountryForm';
 import Results from './CountryResults';
 import { Footer, PrivacyPage, TermsPage } from './Footer';
 import GuessDistribution from './GuessDistribution';
-import InfoText from './InfoText';
+import InfoModal from './InfoModal';
 import SettingsProvider, { useSettings } from './SettingsProvider';
 import Share from './Share';
 import Stamp from './Stamp';
@@ -200,53 +200,10 @@ function CompletionPanel({
       )}
 
       <Group justify="center">
-        <Button variant="outline" onClick={onRandom}>Play random</Button>
-        <Button onClick={onHome}>Back to home</Button>
+        <Button onClick={onRandom}>{mode === 'daily' ? 'Play random' : 'Play again'}</Button>
+        <Button onClick={onHome} variant="outline">Back to home</Button>
       </Group>
     </Stack>
-  );
-}
-
-function CompletionStamp({
-  country,
-  isWon,
-  guessCount,
-}: {
-  country: string;
-  isWon: boolean;
-  guessCount: number;
-}) {
-  return (
-    <Box
-      style={{
-        width: 220,
-        height: 220,
-        padding: 12,
-      }}
-    >
-      <Stamp country={country} isWon={isWon} guessCount={guessCount} />
-    </Box>
-  );
-}
-
-function InfoModal() {
-  const [opened, setOpened] = useState(false);
-
-  return (
-    <>
-      <ActionIcon
-        variant="subtle"
-        color="gray"
-        aria-label="How to play"
-        onClick={() => setOpened(true)}
-      >
-        <IconHelpCircle size={20} />
-      </ActionIcon>
-
-      <Modal opened={opened} onClose={() => setOpened(false)} title="How to play" centered>
-        <InfoText />
-      </Modal>
-    </>
   );
 }
 
@@ -309,11 +266,11 @@ function GamePage({
   };
 
   return (
-    <Stack align="center" gap="xl" mb="10vh">
+    <Stack align="center" gap="sm" mb="10vh">
       <Group gap="xs" justify="center" wrap="nowrap">
         <Text ta="center" fw={500}>
           {isDone
-            ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Nice! Ready for another one?')
+            ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Play again to practice your geography skills!')
             : <>Guess the country. <strong>{guessesLeft} guesses left.</strong></>}
         </Text>
         {!isDone && <InfoModal />}
@@ -332,7 +289,7 @@ function GamePage({
               force={0.6}
             />
           )}
-          <CompletionStamp country={target.country} isWon={isWon} guessCount={guessesData.length} />
+          <Stamp country={target.country} isWon={isWon} guessCount={guessesData.length} />
         </>
       )}
 
@@ -497,7 +454,7 @@ function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode
         >
           Settings
         </Menu.Item>
-        <DarkModeMenuItem />
+        {/* <DarkModeMenuItem /> */}
         <Menu.Divider />
         <Menu.Item
           leftSection={<IconMail size={16} />}
