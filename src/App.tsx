@@ -268,6 +268,7 @@ function GamePage({
   return (
     <Stack align="center" gap="sm" mb="10vh">
       <Group gap="xs" justify="center" wrap="nowrap">
+        {!isDone && <Box style={{ width: 20, height: 20, visibility: 'hidden' }} />}
         <Text ta="center" fw={500}>
           {isDone
             ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Play again to practice your geography skills!')

@@ -48,7 +48,7 @@ function CountryForm({ onSubmit, guessed }: CountryFormProps) {
           size="md"
           value={country ?? null}
         />
-        <Button size="md" variant="contained" type="submit">Guess</Button>
+        <Button size="md" variant="contained" type="submit" style={{ overflow: 'visible' }}>Guess</Button>
       </Group>
     </form>
   );
