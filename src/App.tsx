@@ -3,14 +3,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 import ConfettiExplosion from 'react-confetti-blast';
 
 import {
-  Anchor, Badge, Box, Burger, Button, Center, Container, Group, Menu, Modal, Paper,
+  Badge, Box, Burger, Button, Center,
+  Container, Group, Menu, Modal, Paper,
   Stack, Switch, Text, UnstyledButton, useMantineColorScheme, useMantineTheme,
 } from '@mantine/core';
 import {
   IconBrandGithub, IconCoffee, IconMail, IconMoon, IconSettings, IconSun,
 } from '@tabler/icons-react';
 
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import './App.css';
 import CountryForm from './CountryForm';
@@ -163,15 +164,6 @@ function DailyStatistics({ guessesData, isWon }: { guessesData: CountryData[]; i
           isWon={isWon}
         />
       </Box>
-
-      <Center>
-        <Text size="sm">
-          Like Geodle? Try&nbsp;
-          <Anchor href="https://seadle.muhashi.com/" target="_blank">
-            Seadle
-          </Anchor>
-        </Text>
-      </Center>
     </Stack>
   );
 }
@@ -220,6 +212,7 @@ function GamePage({
 }) {
   const [guessesData, setGuessesData] = useState<CountryData[]>([]);
   const [isWon, setIsWon] = useState(false);
+  const [expandedResults, { toggle }] = useDisclosure(false);
   const { tempFahrenheit, areaMiles } = useSettings();
 
   const [target] = useState<CountryData>(() => (mode === 'daily' ? correctData : pickRandomCountryData()));
@@ -304,12 +297,14 @@ function GamePage({
         />
       )}
 
-      <Results
-        guessesData={guessesData}
-        correctData={target}
-        isTempFahrenheit={tempFahrenheit}
-        isAreaMiles={areaMiles}
-      />
+      {/* <Collapse expanded={!isDone || expandedResults}> */}
+        <Results
+          guessesData={guessesData}
+          correctData={target}
+          isTempFahrenheit={tempFahrenheit}
+          isAreaMiles={areaMiles}
+        />
+      {/* </Collapse> */}
     </Stack>
   );
 }
@@ -397,7 +392,7 @@ function SettingsModal({ opened, setOpened }: { opened: boolean; setOpened: (ope
         <Switch
           className="settings-switch"
           checked={areaMiles}
-          label="Show surface area in square miles"
+          label="Show surface area in mi²"
           onChange={(e) => setAreaMiles(e.currentTarget.checked)}
           mt="md"
         />
@@ -432,13 +427,18 @@ function LogoButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+function HeaderPill({ mode }: { mode: GameMode }) {
+  return (
+    <Badge>{mode === 'daily' ? `Daily · No. ${dayNumber}` : 'Random'}</Badge>
+  );
+}
+
 function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode | null }) {
   const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
   const [displaySettings, setDisplaySettings] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 600px)');
 
-  const badge = mode && (
-    <Badge>{mode === 'daily' ? `Daily · No. ${dayNumber}` : 'Random'}</Badge>
-  );
+  const badge = mode && !isMobile && (<HeaderPill mode={mode} />);
 
   const menu = (
     <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>

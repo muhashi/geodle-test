@@ -293,8 +293,8 @@ function MobileGuessCard({
   return (
     <Box
       style={{
-        background: '#fff',
-        border: '2px solid #c4c4c4',
+        // background: '#f2f0e6',
+        border: '2px solid var(--mantine-color-ink-6)',
         borderRadius: 16,
         padding: '10px 12px 12px',
       }}
@@ -366,13 +366,13 @@ function Results({
   if (guessesData.length === 0) return null;
   const matches = useMediaQuery('(min-width: 600px)');
 
-  if (!matches || isMobile) {
-    return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
-  }
+  // if (!matches || isMobile) {
+  //   return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
+  // }
 
   return (
     <Box w="100%" maw="50rem" mx="auto">
-      <Grid columns={7} gutter={6} align="stretch" ml="0.3rem" mr="0.3rem">
+      <Grid columns={7} gap={1} align="stretch" ml="0.3rem" mr="0.3rem">
         {/* Header row */}
         <Grid.Col span={1} style={colStyle}>
           <Box
