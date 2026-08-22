@@ -312,7 +312,7 @@ function MobileGuessCard({
         {guessData.country}
       </Text>
 
-      <Grid columns={3} gutter={6} mt={8}>
+      <Grid columns={3} gap={6} mt={8}>
         {COLUMNS.map(({label}, columnIndex) => {
           const hint = getHintResult(correctValues[columnIndex], guessValues[columnIndex]);
           const displayValue = formatCellValue(columnIndex, guessValues[columnIndex], isTempFahrenheit, isAreaMiles);
@@ -364,7 +364,7 @@ function Results({
   isMobile?: boolean;
 }) {
   if (guessesData.length === 0) return null;
-  const matches = useMediaQuery('(min-width: 600px)');
+  const mobile = isMobile || useMediaQuery('(max-width: 600px)');
 
   // if (!matches || isMobile) {
   //   return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
@@ -372,7 +372,7 @@ function Results({
 
   return (
     <Box w="100%" maw="50rem" mx="auto">
-      <Grid columns={7} gap={1} align="stretch" ml="0.3rem" mr="0.3rem">
+      <Grid columns={7} gap={mobile ? 1 : "xs"} align="stretch" ml="0.3rem" mr="0.3rem">
         {/* Header row */}
         <Grid.Col span={1} style={colStyle}>
           <Box

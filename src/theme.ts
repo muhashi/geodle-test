@@ -113,7 +113,7 @@ export const theme = createTheme({
     }),
     Text: Text.extend({
       defaultProps: {
-        color: 'ink.6',
+        c: 'ink.6',
         fw: 500,
       },
     }),
