@@ -331,7 +331,7 @@ function HomeActionCard({
       p="sm"
       style={{
         flex: 1,
-        minWidth: 180,
+        minWidth: 150,
         textAlign: 'center',
         backgroundColor: emphasized ? 'var(--mantine-color-ink-6)' : 'var(--mantine-color-body)',
         border: emphasized ? 'none' : '1px solid var(--mantine-color-ink-6)',
@@ -368,7 +368,7 @@ function HomePage({
         </Text>
 
         <Group mt="md" w="100%" wrap="nowrap">
-          <HomeActionCard title="Daily" subtitle="New country every day!" onClick={onDaily} emphasized />
+          <HomeActionCard title="Daily" subtitle="New country daily!" onClick={onDaily} emphasized />
           <HomeActionCard title="Quick Play" subtitle="Unlimited practice!" onClick={onRandom} />
         </Group>
       </Stack>
@@ -428,17 +428,20 @@ function LogoButton({ onClick }: { onClick: () => void }) {
 }
 
 function HeaderPill({ mode }: { mode: GameMode }) {
+  const isMobile = useMediaQuery('(max-width: 450px)');
+  const isXsMobile = useMediaQuery('(max-width: 400px)');
+  const dailyPillText = isXsMobile ? `#${dayNumber}` : `Daily #${dayNumber}`;
+
   return (
-    <Badge>{mode === 'daily' ? `Daily · No. ${dayNumber}` : 'Random'}</Badge>
+    <Badge size={isMobile ? 'xs' : 'md'}>{mode === 'daily' ? dailyPillText : 'Random'}</Badge>
   );
 }
 
 function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode | null }) {
   const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
   const [displaySettings, setDisplaySettings] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 600px)');
 
-  const badge = mode && !isMobile && (<HeaderPill mode={mode} />);
+  const badge = mode && (<HeaderPill mode={mode} />);
 
   const menu = (
     <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>

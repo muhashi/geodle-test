@@ -20,7 +20,6 @@
 }
 
 .title-text span {
-  /* --shadow-color: #0A2E27; */
   position: relative;
   top: 10px;
   display: inline-block;
@@ -28,8 +27,6 @@
   font-size: 50px;
   color: #00a68a;
   font-weight: 1000;
-  /* text-shadow: 0 1px 0 var(--shadow-color), 0 2px 0 var(--shadow-color), 0 3px 0 var(--shadow-color), 0 4px 0 var(--shadow-color),
-    0 5px 0 var(--shadow-color), 0 6px 0 transparent, 0 7px 0 transparent, 0 8px 0 transparent; */
 }
 
 .title-text span:nth-child(2) {
