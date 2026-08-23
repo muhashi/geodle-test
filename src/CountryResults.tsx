@@ -243,6 +243,7 @@ function MobileStatCard({
   return (
     <Box style={{ ...sharedBoxStyle, background: isCorrect ? HINT_GREEN : HINT_RED }}>
       <Text
+        c="white"
         ta="center"
         fw={600}
         tt="uppercase"
@@ -293,8 +294,8 @@ function MobileGuessCard({
   return (
     <Box
       style={{
-        // background: '#f2f0e6',
-        border: '2px solid var(--mantine-color-ink-6)',
+        background: 'var(--mantine-color-body)',
+        // border: '2px solid var(--mantine-color-ink-6)',
         borderRadius: 16,
         padding: '10px 12px 12px',
       }}
@@ -366,9 +367,9 @@ function Results({
   if (guessesData.length === 0) return null;
   const mobile = isMobile || useMediaQuery('(max-width: 600px)');
 
-  // if (!matches || isMobile) {
-  //   return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
-  // }
+  if (mobile) {
+    return <MobileResults guessesData={guessesData} correctData={correctData} isTempFahrenheit={isTempFahrenheit} isAreaMiles={isAreaMiles} />;
+  }
 
   return (
     <Box w="100%" maw="50rem" mx="auto">
