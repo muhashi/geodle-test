@@ -17,7 +17,7 @@ export function Footer({
         <Text size="sm" c="dimmed">
           by
         </Text>
-        <Anchor href="https://muhashi.com/" target="_blank" size="sm" c="dimmed">
+        <Anchor href="https://muhashi.com/" target="_blank" size="sm" c="ink.6">
           muhashi
         </Anchor>
       </Group>

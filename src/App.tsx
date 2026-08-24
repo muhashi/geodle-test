@@ -59,6 +59,13 @@ const correctData: CountryData = {
 
 const CONTACT_EMAIL = atob('aGVsbG9AZ2VvZGxlLm1l');
 const GITHUB_URL = 'https://github.com/muhashi/geodle';
+const TOTAL_GUESSES = 7;
+
+interface global {
+    playlightSDK?: {
+        setDiscovery: (show: boolean) => void;
+    };
+};
 
 function VerticalText({ top, bottom }: { top: string | number; bottom: string }) {
   return (
@@ -168,6 +175,17 @@ function DailyStatistics({ guessesData, isWon }: { guessesData: CountryData[]; i
   );
 }
 
+function MoreGamesButton() {
+  return (
+    <Button
+      onClick={() => {(globalThis as global)?.playlightSDK?.setDiscovery(true)}}
+      variant="light"
+    >
+      More games
+    </Button>
+  );
+}
+
 // Shown once a game (daily or random) is finished, below the country stamp.
 function CompletionPanel({
   mode,
@@ -185,10 +203,7 @@ function CompletionPanel({
   return (
     <Stack align="center" gap="xl" w="100%" style={{ maxWidth: 420 }}>
       {mode === 'daily' && (
-        <>
-          <DailyStatistics guessesData={guessesData} isWon={isWon} />
-          <Share guessesData={guessesData} />
-        </>
+        <DailyStatistics guessesData={guessesData} isWon={isWon} />
       )}
 
       <Group justify="center">
@@ -212,12 +227,13 @@ function GamePage({
 }) {
   const [guessesData, setGuessesData] = useState<CountryData[]>([]);
   const [isWon, setIsWon] = useState(false);
-  const [expandedResults, { toggle }] = useDisclosure(false);
+  // Tracks whether we've finished checking cookies for a saved in-progress game,
+  // so we don't clobber a saved game with an empty guess list before it loads.
+  const [hasLoadedSavedGame, setHasLoadedSavedGame] = useState(mode !== 'daily');
   const { tempFahrenheit, areaMiles } = useSettings();
 
   const [target] = useState<CountryData>(() => (mode === 'daily' ? correctData : pickRandomCountryData()));
 
-  const TOTAL_GUESSES = 7;
   const guessesLeft = TOTAL_GUESSES - guessesData.length;
   const isLost = !isWon && guessesLeft <= 0;
   const isDone = isWon || isLost;
@@ -233,16 +249,15 @@ function GamePage({
       setGuessesData(data);
       setIsWon(data.some(d => d.country.toLowerCase() === correctCountry.toLowerCase()));
     }
+    setHasLoadedSavedGame(true);
     return undefined;
   }, []);
 
   useEffect(() => {
-    if (mode !== 'daily') return;
-    if (isWon || isLost) {
-      Cookies.set('lastAttempt', dayNumber.toString(), { expires: 1 });
-      Cookies.set('lastAttemptData', JSON.stringify(guessesData), { expires: 1 });
-    }
-  }, [mode, isWon, isLost]);
+    if (mode !== 'daily' || !hasLoadedSavedGame) return;
+    Cookies.set('lastAttempt', dayNumber.toString(), { expires: 1 });
+    Cookies.set('lastAttemptData', JSON.stringify(guessesData), { expires: 1 });
+  }, [mode, guessesData, hasLoadedSavedGame]);
 
   const onSubmit = (guess: string) => {
     const clean = guess.toLowerCase().trim();
@@ -284,6 +299,10 @@ function GamePage({
             />
           )}
           <Stamp country={target.country} isWon={isWon} guessCount={guessesData.length} />
+          <Group>
+            {mode === 'daily' && <Share guessesData={guessesData} />}
+            <MoreGamesButton />
+          </Group>
         </>
       )}
 
@@ -297,14 +316,14 @@ function GamePage({
         />
       )}
 
-      {/* <Collapse expanded={!isDone || expandedResults}> */}
+      {!isDone && (
         <Results
           guessesData={guessesData}
           correctData={target}
           isTempFahrenheit={tempFahrenheit}
           isAreaMiles={areaMiles}
         />
-      {/* </Collapse> */}
+      )}
     </Stack>
   );
 }
@@ -318,34 +337,123 @@ function HomeActionCard({
   subtitle,
   onClick,
   emphasized,
+  disabled,
 }: {
   title: string;
   subtitle: string;
   onClick: () => void;
   emphasized?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <UnstyledButton
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
       className="home-action-card"
       p="sm"
       style={{
         flex: 1,
         minWidth: 150,
         textAlign: 'center',
-        backgroundColor: emphasized ? 'var(--mantine-color-ink-6)' : 'var(--mantine-color-body)',
-        border: emphasized ? 'none' : '1px solid var(--mantine-color-ink-6)',
+        backgroundColor: disabled
+          ? 'var(--mantine-color-gray-2)'
+          : (emphasized ? 'var(--mantine-color-ink-6)' : 'var(--mantine-color-body)'),
+        border: disabled
+          ? '2px solid var(--mantine-color-gray-4)'
+          : (emphasized ? 'none' : '2px solid var(--mantine-color-ink-6)'),
         borderRadius: 'var(--mantine-radius-lg)',
         transition: 'transform 0.2s ease-in-out',
+        opacity: disabled ? 0.7 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
-      <Text fw={700} fz="lg" c={emphasized ? 'white' : 'ink'}>
+      <Text fw={700} fz="lg" c={disabled ? 'dimmed' : (emphasized ? 'white' : 'ink')}>
         {title}
       </Text>
-      <Text fz="xs" c={emphasized ? 'ink.1' : 'dimmed'}>
+      <Text fz="xs" c={disabled ? 'dimmed' : (emphasized ? 'ink.1' : 'dimmed')}>
         {subtitle}
       </Text>
     </UnstyledButton>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Daily lock / resume status — drives the homepage Daily button
+// ---------------------------------------------------------------------------
+
+type DailyStatus = 'new' | 'in-progress' | 'done';
+
+// Reads today's saved daily progress (if any) straight from cookies.
+function getDailyStatus(): DailyStatus {
+  const lastAttempt = Cookies.get('lastAttempt');
+  const lastAttemptData = Cookies.get('lastAttemptData');
+
+  if (!lastAttempt || Number(lastAttempt) !== dayNumber || !lastAttemptData) {
+    return 'new';
+  }
+
+  try {
+    const data: CountryData[] = JSON.parse(lastAttemptData);
+    const won = data.some((d) => d.country.toLowerCase() === correctCountry.toLowerCase());
+    const lost = !won && data.length >= TOTAL_GUESSES;
+    return won || lost ? 'done' : 'in-progress';
+  } catch {
+    return 'new';
+  }
+}
+
+// A new daily unlocks at the next local midnight.
+function msUntilNextDaily(): number {
+  const next = new Date();
+  next.setHours(24, 0, 0, 0);
+  return next.getTime() - Date.now();
+}
+
+function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+// Renders the homepage's Daily tile in whichever of the three states applies:
+// not started yet, resumable (saved progress from earlier today), or done
+// (disabled, counting down to tomorrow's country).
+function DailyHomeCard({ onClick }: { onClick: () => void }) {
+  const [status] = useState<DailyStatus>(getDailyStatus);
+  const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextDaily()));
+
+  useEffect(() => {
+    if (status !== 'done') return undefined;
+
+    const id = setInterval(() => {
+      setCountdown(formatCountdown(msUntilNextDaily()));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [status]);
+
+  if (status === 'done') {
+    return (
+      <HomeActionCard
+        title="Daily"
+        subtitle={`New country in ${countdown}`}
+        onClick={onClick}
+        emphasized
+        disabled
+      />
+    );
+  }
+
+  return (
+    <HomeActionCard
+      title={status === 'in-progress' ? 'Resume Daily' : 'Daily'}
+      subtitle={status === 'in-progress' ? 'Continue where you left off!' : 'New country daily!'}
+      onClick={onClick}
+      emphasized
+    />
   );
 }
 
@@ -368,12 +476,15 @@ function HomePage({
         </Text>
 
         <Group mt="md" w="100%" wrap="nowrap">
-          <HomeActionCard title="Daily" subtitle="New country daily!" onClick={onDaily} emphasized />
+          <DailyHomeCard onClick={onDaily} />
           <HomeActionCard title="Quick Play" subtitle="Unlimited practice!" onClick={onRandom} />
         </Group>
       </Stack>
 
-      <Footer onTerms={onTerms} onPrivacy={onPrivacy} />
+      <Stack align="center" gap="md">
+        <MoreGamesButton />
+        <Footer onTerms={onTerms} onPrivacy={onPrivacy} />
+      </Stack>
     </Stack>
   );
 }

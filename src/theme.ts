@@ -98,7 +98,6 @@ export const theme = createTheme({
     Paper: Paper.extend({
       defaultProps: {
         radius: 'lg',
-        shadow: 'sm',
       },
     }),
     Modal: Modal.extend({

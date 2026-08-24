@@ -52,7 +52,7 @@ function Share({ guessesData }: { guessesData: CountryData[] }) {
   const copyText = `${title}\n${emojis}`;
 
   return (
-      <Button onClick={() => clipboard.copy(copyText)} color={clipboard.copied ? "var(--mantine-color-green-6)" : "var(--mantine-color-yellow-6)"} radius="md">
+      <Button onClick={() => clipboard.copy(copyText)} color={clipboard.copied ? "var(--mantine-color-green-6)" : "var(--mantine-color-yellow-6)"}>
         {clipboard.copied ? 'Copied!' : 'Share results'}
       </Button>
   );
