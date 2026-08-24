@@ -104,12 +104,12 @@
 		}
 }
 
-.home-action-card {
-  transition: transform 0.05s ease-in-out;
-}
-
 .home-action-card:hover {
   transform: scale(1.02);
+}
+
+.home-action-card:hover:not([aria-disabled='true']) {
+  filter: brightness(1.15);
 }
 
 .settings-switch[data-checked="false"] .mantine-Switch-track {
