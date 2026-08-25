@@ -2,7 +2,7 @@ import { Fragment, ReactNode, JSX } from 'react';
 import { Box, Grid, Text, Tooltip } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import { formatPopulation, getEmojiHintText, tempFahrenheit, km2ToMi2 } from './helpers';
+import { formatPopulation, getEmojiHintText, tempFahrenheit, km2ToMi2, shortenCountryName } from './helpers';
 
 
 const HINT_GREEN = '#2F6349';
@@ -310,7 +310,7 @@ function MobileGuessCard({
           ...wrapStyle,
         }}
       >
-        {guessData.country}
+        {shortenCountryName(guessData.country)}
       </Text>
 
       <Grid columns={3} gap={6} mt={8}>
@@ -430,7 +430,7 @@ function Results({
             <Fragment key={guessData.country}>
               <Grid.Col span={1} style={colStyle}>
                 <ResultCard background={isCorrectGuess ? HINT_GREEN : HINT_RED}>
-                  {guessData.country}
+                  {shortenCountryName(guessData.country)}
                 </ResultCard>
               </Grid.Col>
 

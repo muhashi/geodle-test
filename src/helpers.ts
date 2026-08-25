@@ -53,6 +53,23 @@ function km2ToMi2(km2: number): number {
   return km2 / 2.59;
 }
 
+const COUNTRY_ABBREVIATIONS: Record<string, string> = {
+  'The Democratic Republic of Congo': 'DR Congo',
+  'Saint Vincent and the Grenadines': 'St Vincent & Grenadines',
+  'Federated States of Micronesia': 'Micronesia',
+  'Central African Republic': 'Central African Rep.',
+  'Bosnia and Herzegovina': 'Bosnia & Herzegovina',
+  'Sao Tome and Principe': 'Sao Tome & Principe',
+  'Saint Kitts and Nevis': 'St Kitts & Nevis',
+  'United Arab Emirates': 'UAE',
+  'Antigua and Barbuda': 'Antigua & Barbuda',
+  'Trinidad and Tobago': 'Trinidad & Tobago',
+};
+
+function shortenCountryName(name: string): string {
+  return COUNTRY_ABBREVIATIONS[name] ?? name;
+}
+
 export {
-  isApproxEqual, getEmojiHintText, tempFahrenheit, formatPopulation, km2ToMi2,
+  isApproxEqual, getEmojiHintText, tempFahrenheit, formatPopulation, km2ToMi2, shortenCountryName,
 };
