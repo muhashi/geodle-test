@@ -20,9 +20,9 @@ export default function Stamp({ country, isWon, guessCount }: { country: string;
           <path id="arcTop" d="M 34,120 A 86,86 0 0 1 206,120" />
           <path id="arcBottom" d="M 206,132 A 86,74 0 0 1 34,132" />
         </defs>
-        <circle cx="120" cy="120" r="98" fill="none" stroke={color} strokeWidth="2" strokeDasharray="3 3" opacity="0.55" />
-        <circle cx="120" cy="120" r="84" fill="none" stroke={color} strokeWidth="2.5" />
-        <text fontFamily="monospace" fontSize="15" fontWeight="600" fill={color} letterSpacing="3">
+        <circle cx="120" cy="120" r="106" fill="none" stroke={color} strokeWidth="2" strokeDasharray="3 3" opacity="0.55" />
+        <circle cx="120" cy="120" r="78" fill="none" stroke={color} strokeWidth="2.5" />
+        <text fontFamily="monospace" fontSize="19" fontWeight="600" fill={color} letterSpacing="1">
           <textPath href="#arcTop" startOffset="50%" textAnchor="middle">{country}</textPath>
         </text>
         <text x="120" y={isWon ? "115" : "125"} textAnchor="middle" fontFamily="serif" fontStyle="italic" fontWeight="700" fontSize="22" fill={color}>{isWon ? 'Found' : 'Failed'}</text>
@@ -31,7 +31,7 @@ export default function Stamp({ country, isWon, guessCount }: { country: string;
             IN {guessCount} GUESSES
           </text>
         )}
-        <text fontFamily="monospace" fontSize="12" fontWeight="600" fill={color} letterSpacing="4">
+        <text fontFamily="monospace" fontSize="16" fontWeight="600" fill={color} letterSpacing="3">
           <textPath href="#arcBottom" startOffset="50%" textAnchor="middle">GEODLE</textPath>
         </text>
       </svg>
