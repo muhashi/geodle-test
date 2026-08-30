@@ -16,7 +16,7 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import './App.css';
 import CountryForm from './CountryForm';
 import Results from './CountryResults';
-import { Footer, PrivacyPage, TermsPage } from './Footer';
+import { Footer, PrivacyPage, TermsPage, UpdatesPage } from './Footer';
 import GuessDistribution from './GuessDistribution';
 import InfoModal from './InfoModal';
 import SettingsProvider, { useSettings } from './SettingsProvider';
@@ -462,11 +462,13 @@ function HomePage({
   onRandom,
   onTerms,
   onPrivacy,
+  onUpdates,
 }: {
   onDaily: () => void;
   onRandom: () => void;
   onTerms: () => void;
   onPrivacy: () => void;
+  onUpdates: () => void;
 }) {
   return (
     <Stack align="center" justify="space-between" mih="70vh" py="xl">
@@ -483,7 +485,7 @@ function HomePage({
 
       <Stack align="center" gap="md">
         <MoreGamesButton />
-        <Footer onTerms={onTerms} onPrivacy={onPrivacy} />
+        <Footer onTerms={onTerms} onPrivacy={onPrivacy} onUpdates={onUpdates} />
       </Stack>
     </Stack>
   );
@@ -613,7 +615,7 @@ function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode
   );
 }
 
-type View = 'home' | 'daily' | 'random' | 'terms' | 'privacy';
+type View = 'home' | 'daily' | 'random' | 'terms' | 'privacy' | 'updates';
 
 function Content({
   view,
@@ -637,6 +639,8 @@ function Content({
       return <TermsPage onBack={goHome} />;
     case 'privacy':
       return <PrivacyPage onBack={goHome} />;
+    case 'updates':
+      return <UpdatesPage onBack={goHome} />;
     case 'home':
     default:
       return (
@@ -645,6 +649,7 @@ function Content({
           onRandom={goRandom}
           onTerms={() => setView('terms')}
           onPrivacy={() => setView('privacy')}
+          onUpdates={() => setView('updates')}
         />
       );
   }

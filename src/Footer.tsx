@@ -1,5 +1,5 @@
 import {
-    Anchor, Group, Paper, Stack, Text,
+  Anchor, Group, Paper, Stack, Text,
 } from '@mantine/core';
 import { ReactNode } from 'react';
 
@@ -7,9 +7,11 @@ import { ReactNode } from 'react';
 export function Footer({
   onTerms,
   onPrivacy,
+  onUpdates,
 }: {
   onTerms: () => void;
   onPrivacy: () => void;
+  onUpdates: () => void;
 }) {
   return (
     <Group justify="center" gap="xs" mt="xl" pb="md">
@@ -21,6 +23,10 @@ export function Footer({
           muhashi
         </Anchor>
       </Group>
+      <Text c="dimmed" size="sm">&middot;</Text>
+      <Anchor component="button" type="button" size="sm" c="dimmed" onClick={onUpdates}>
+        Updates
+      </Anchor>
       <Text c="dimmed" size="sm">&middot;</Text>
       <Anchor component="button" type="button" size="sm" c="dimmed" onClick={onTerms}>
         Terms
@@ -73,7 +79,7 @@ export function TermsPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         Acceptable Use
       </Text>
-      <Text>
+      <Text component="div">
         You agree not to misuse the Website. In particular, you agree not to:
         <ul>
           <li>Attempt to gain unauthorized access to any part of the Website or our systems;</li>
@@ -137,7 +143,7 @@ export function TermsPage({ onBack }: { onBack: () => void }) {
       <Text>
         If you have any questions about these Terms of Service, please contact us at hello [at symbol] geodle [dot symbol] me
       </Text>
-  </StaticPage>
+    </StaticPage>
   );
 }
 
@@ -153,7 +159,7 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         Information Collected
       </Text>
-      <Text>
+      <Text component="div">
         Geodle does not require an account, login, or any payment to play. We do not collect names, email addresses, or other information you might use to sign up for a typical website. The only information we collect is:
         <ul>
           <li>Automatically Collected Information: Device information, IP address, browser type, operating system, and general usage data (such as pages viewed and session duration).</li>
@@ -165,7 +171,7 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         How We Use Your Information
       </Text>
-      <Text>We use the collected data for the following purposes:
+      <Text component="div">We use the collected data for the following purposes:
         <ul>
           <li>To provide and improve the Geodle game and its features.</li>
           <li>To analyze traffic and understand user behavior via Google Analytics (loaded through Google Tag Manager), including aggregated metrics on sessions, page views, and feature engagement.</li>
@@ -175,7 +181,7 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         Sharing Your Information
       </Text>
-      <Text>
+      <Text component="div">
         We do not sell or share your personal information, and we do not work with any advertising partners. The third parties that receive data about your visit are:
         <ul>
           <li>Google Analytics / Google Tag Manager, used solely for website analytics. Google&apos;s handling of this data is described at https://policies.google.com/technologies/partner-sites.</li>
@@ -198,7 +204,7 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         Cookies and Tracking Technologies
       </Text>
-      <Text>
+      <Text component="div">
         We use cookies for a few different purposes:
         <ul>
           <li>Gameplay cookies: We use cookies to store your streak, scores, and past results directly on your device, so your progress carries over between visits. These stay on your device and are not sent to us.</li>
@@ -210,7 +216,7 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
       <Text size="lg" fw={700}>
         Other Third-Party Services
       </Text>
-      <Text>
+      <Text component="div">
         <ul>
           <li>Playlight: We load the Playlight exit-intent engagement SDK on game results pages. Playlight may set cookies or identifiers to recommend related sites you might enjoy. See https://playlight.dev/privacy for details.</li>
         </ul>
@@ -234,6 +240,22 @@ export function PrivacyPage({ onBack }: { onBack: () => void }) {
         If you have any questions or concerns about this Privacy Policy, please contact us at: hello [at symbol] geodle [dot symbol] me
       </Text>
 
+    </StaticPage>
+  );
+}
+
+export function UpdatesPage({ onBack }: { onBack: () => void }) {
+  return (
+    <StaticPage title="Updates" onBack={onBack}>
+      <Text size="lg" fw={700}>
+        Sep 1, 2026
+      </Text>
+      <Text>
+        Launch of the new Geodle design! I hope you enjoy it :&#41;
+      </Text>
+      <Text>
+        Please email me any feedback or bugs: hello [at symbol] geodle [dot symbol] me
+      </Text>
     </StaticPage>
   );
 }
