@@ -139,7 +139,7 @@ function formatCellValue(columnIndex: number, value: DemographicDataType, isTemp
     case 5: // Surface Area
       return value === 0
         ? 'N/A'
-        : (isAreaMiles ? `${formatPopulation(km2ToMi2(value as number))} mi²` : `${formatPopulation(value as number)} km²`);
+        : formatPopulation(isAreaMiles ? km2ToMi2(value as number) : (value as number));
     default:
       return String(value);
   }
@@ -400,11 +400,14 @@ function Results({
             </Text>
           </Box>
         </Grid.Col>
-        {COLUMNS.map((column) => (
-          <Grid.Col span={1} key={column.label} style={colStyle}>
-            <HeaderCell {...column} />
-          </Grid.Col>
-        ))}
+        {COLUMNS.map((column) => {
+          const tip = column.label === 'Area' ? `${column.tip} (${isAreaMiles ? 'mi²' : 'km²'})` : column.tip;
+          return (
+            <Grid.Col span={1} key={column.label} style={colStyle}>
+              <HeaderCell label={column.label} tip={tip} />
+            </Grid.Col>
+          );
+        })}
 
         {/* Guess rows */}
         {[...guessesData].reverse().map((guessData) => {
