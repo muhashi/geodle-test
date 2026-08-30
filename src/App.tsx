@@ -239,6 +239,14 @@ function GamePage({
     [guessesData, target.continent],
   );
 
+  const excludedContinents = useMemo(() => {
+    const set = new Set<string>();
+    for (const g of guessesData) {
+      if (g.continent && g.continent !== target.continent) set.add(g.continent);
+    }
+    return set;
+  }, [guessesData, target.continent]);
+
   const guessesLeft = TOTAL_GUESSES - guessesData.length;
   const isLost = !isWon && guessesLeft <= 0;
   const isDone = isWon || isLost;
@@ -284,7 +292,7 @@ function GamePage({
         {!isDone && <Box style={{ width: 20, height: 20, visibility: 'hidden' }} />}
         <Text ta="center" fw={500}>
           {isDone
-            ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : 'Play again to practice your geography skills!')
+            ? (mode === 'daily' ? 'Come back tomorrow for a new country!' : (isWon ? 'Amazing geography skills!' : 'Better luck next time!'))
             : <>Guess the country. <strong>{guessesLeft} guesses left.</strong></>}
         </Text>
         {!isDone && <InfoModal />}
@@ -295,6 +303,7 @@ function GamePage({
           onSubmit={onSubmit}
           guessed={guessesData.map(({ country }) => country)}
           revealedContinent={revealedContinent}
+          excludedContinents={excludedContinents}
         />
       )}
 

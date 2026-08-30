@@ -28,7 +28,7 @@ const wrapStyle = {
   overflowWrap: 'break-word' as const,
   hyphens: 'auto' as const,
   WebkitHyphens: 'auto' as const,
-  mozHyphens: 'auto' as const,
+  MozHyphens: 'auto' as const,
   msHyphens: 'auto' as const,
 };
 
