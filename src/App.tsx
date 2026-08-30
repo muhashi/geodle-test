@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import ConfettiExplosion from 'react-confetti-blast';
 
 import {
@@ -234,6 +234,11 @@ function GamePage({
 
   const [target] = useState<CountryData>(() => (mode === 'daily' ? correctData : pickRandomCountryData()));
 
+  const revealedContinent = useMemo(
+    () => (guessesData.some((g) => g.continent === target.continent) ? target.continent : null),
+    [guessesData, target.continent],
+  );
+
   const guessesLeft = TOTAL_GUESSES - guessesData.length;
   const isLost = !isWon && guessesLeft <= 0;
   const isDone = isWon || isLost;
@@ -286,7 +291,11 @@ function GamePage({
       </Group>
 
       {!isDone && (
-        <CountryForm onSubmit={onSubmit} guessed={guessesData.map(({ country }) => country)} />
+        <CountryForm
+          onSubmit={onSubmit}
+          guessed={guessesData.map(({ country }) => country)}
+          revealedContinent={revealedContinent}
+        />
       )}
 
       {isDone && (

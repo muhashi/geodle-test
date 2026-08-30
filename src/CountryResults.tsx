@@ -220,10 +220,12 @@ function MobileStatCard({
   columnIndex,
   hint,
   displayValue,
+  tip,
 }: {
   columnIndex: number;
   hint: HintResult;
   displayValue: string;
+  tip: string;
 }) {
   const { label } = COLUMNS[columnIndex];
 
@@ -242,16 +244,26 @@ function MobileStatCard({
   const isCorrect = hint === 'correct';
   return (
     <Box style={{ ...sharedBoxStyle, background: isCorrect ? HINT_GREEN : HINT_RED }}>
-      <Text
-        c="white"
-        ta="center"
-        fw={600}
-        tt="uppercase"
-        lang="en"
-        style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.85)', ...wrapStyle }}
-      >
-        {label}
-      </Text>
+      <Tooltip label={tip} withinPortal multiline w={220} events={{ hover: true, focus: true, touch: true }}>
+        <Text
+          c="white"
+          ta="center"
+          fw={600}
+          tt="uppercase"
+          lang="en"
+          style={{
+            fontSize: '0.55rem',
+            color: 'rgba(255,255,255,0.85)',
+            textDecoration: 'underline dotted',
+            textDecorationThickness: '1.5px',
+            textUnderlineOffset: 1,
+            cursor: 'pointer',
+            ...wrapStyle,
+          }}
+        >
+          {label}
+        </Text>
+      </Tooltip>
       <Text fw={700} c="white" ta="center" lang="en" style={{ fontSize: '0.78rem', ...wrapStyle }}>
           {displayValue}
           {hint === 'up' && ' ↑'}
@@ -317,10 +329,12 @@ function MobileGuessCard({
         {COLUMNS.map(({label}, columnIndex) => {
           const hint = getHintResult(correctValues[columnIndex], guessValues[columnIndex]);
           const displayValue = formatCellValue(columnIndex, guessValues[columnIndex], isTempFahrenheit, isAreaMiles);
+          const column = COLUMNS[columnIndex];
+          const tip = column.label === 'Area' ? `${column.tip} (${isAreaMiles ? 'mi²' : 'km²'})` : column.tip;
 
           return (
             <Grid.Col span={1} key={label} style={colStyle}>
-              <MobileStatCard columnIndex={columnIndex} hint={hint} displayValue={displayValue} />
+              <MobileStatCard columnIndex={columnIndex} hint={hint} displayValue={displayValue} tip={tip} />
             </Grid.Col>
           );
         })}

@@ -10,6 +10,7 @@ import continentData from './data/country-by-continent.json';
 type CountryFormProps = {
   onSubmit: (country: string) => void;
   guessed: string[];
+  revealedContinent?: string | null;
 };
 
 // Order in which continent groups appear in the dropdown
@@ -27,12 +28,13 @@ const continentMap = new Map(
   continentData.map((entry) => [entry.country.toLowerCase(), entry.continent]),
 );
 
-function buildGroupedData(guessed: string[]): ComboboxItemGroup<ComboboxItem>[] {
+function buildGroupedData(guessed: string[], revealedContinent: string | null): ComboboxItemGroup<ComboboxItem>[] {
   const groups = new Map<string, ComboboxItem[]>();
 
   wordlist.forEach((countryName) => {
     if (guessed.includes(countryName)) return;
     const continent = continentMap.get(countryName.toLowerCase()) ?? 'Other';
+    if (revealedContinent && continent !== revealedContinent) return;
     const items = groups.get(continent) ?? [];
     items.push({ value: countryName, label: countryName });
     groups.set(continent, items);
@@ -46,11 +48,11 @@ function buildGroupedData(guessed: string[]): ComboboxItemGroup<ComboboxItem>[] 
     }));
 }
 
-function CountryForm({ onSubmit, guessed }: CountryFormProps) {
+function CountryForm({ onSubmit, guessed, revealedContinent = null }: CountryFormProps) {
   const [country, setCountry] = useState<string | null>(null);
   const isMobile = useMediaQuery(`(max-width: 600px)`);
 
-  const data = useMemo(() => buildGroupedData(guessed), [guessed]);
+  const data = useMemo(() => buildGroupedData(guessed, revealedContinent), [guessed, revealedContinent]);
 
   const filter: OptionsFilter = ({ options, search }) => {
     const clean = search.replace(/[^A-Za-z\s]/g, '').toLowerCase().trim();
