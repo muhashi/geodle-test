@@ -19,7 +19,7 @@ export const theme = createTheme({
   primaryColor: 'green',
   defaultRadius: 'lg',
 
-  white: '#FBF7EA',
+  white: '#fffdf7',
 
   other: {
     pageBackground: '#F1EBD9',

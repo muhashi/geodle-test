@@ -577,7 +577,7 @@ function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode
   const menu = (
     <Menu opened={menuOpened} onChange={toggleMenu} position="bottom-end" withArrow>
       <Menu.Target>
-        <Burger opened={menuOpened} onClick={toggleMenu} size="md" aria-label="Open menu" />
+        <Burger opened={menuOpened} onClick={toggleMenu} size="md" aria-label="Open menu" lineSize={3} />
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
