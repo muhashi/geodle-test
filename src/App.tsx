@@ -14,7 +14,7 @@ import {
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import './App.css';
-import { AdBanner, AD_SLOTS } from './AdSense';
+import { AdBanner } from './AdSense';
 import CountryForm from './CountryForm';
 import Results from './CountryResults';
 import { Footer, PrivacyPage, TermsPage, UpdatesPage } from './Footer';
@@ -61,6 +61,13 @@ const correctData: CountryData = {
 const CONTACT_EMAIL = atob('aGVsbG9AZ2VvZGxlLm1l');
 const GITHUB_URL = 'https://github.com/muhashi/geodle';
 const TOTAL_GUESSES = 7;
+
+const AD_SLOTS = {
+  HOME_BANNER: '4988621227',
+  GAME_BANNER_TOP: '5571804104',
+  GAME_BANNER_BOTTOM: '1712450148',
+};
+
 
 interface global {
   playlightSDK?: {
@@ -282,6 +289,8 @@ function GamePage({
 
   return (
     <Stack align="center" gap="sm" mb="10vh">
+      {isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_TOP} style={{ maxWidth: 728, width: '100%' }} />}
+
       <Group gap="xs" justify="center" wrap="nowrap">
         {!isDone && <Box style={{ width: 20, height: 20, visibility: 'hidden' }} />}
         <Text ta="center" fw={500}>
@@ -337,9 +346,7 @@ function GamePage({
         />
       )}
 
-      {/* AdSense banners — top during play, bottom after completion */}
-      {!isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_TOP} style={{ maxWidth: 728, width: '100%' }} />}
-      {isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_BOTTOM} style={{ maxWidth: 728, width: '100%' }} />}
+      {!isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_BOTTOM} style={{ maxWidth: 728, width: '100%' }} />}
     </Stack>
   );
 }
