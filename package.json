@@ -5,11 +5,11 @@
   "type": "module",
   "homepage": "https://test.geodle.me",
   "dependencies": {
-    "@mantine/core": "^9.5.2",
+    "@mantine/core": "^9.6.0",
     "@mantine/hooks": "^9.5.2",
     "@tabler/icons-react": "^3.46.0",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^26.4.0",
+    "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.1",
