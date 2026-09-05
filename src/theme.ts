@@ -22,7 +22,7 @@ export const theme = createTheme({
   white: '#fffdf7',
 
   other: {
-    pageBackground: '#F1EBD9',
+    pageBackground: '#f2efe6',
     gridLine: 'rgba(35, 43, 61, 0.08)',
   },
 
@@ -46,7 +46,7 @@ export const theme = createTheme({
       '#80B393',
       '#5C9975',
       '#437D5C',
-      '#2F6349',
+      '#007326',
       '#25503A',
       '#1B3C2B',
       '#12291D',

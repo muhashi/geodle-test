@@ -32,20 +32,17 @@ function tempFahrenheit(celsius: number) {
   return (celsius * 9) / 5 + 32;
 }
 
-// Rounds population to 3 significant figures and adds locale specific thousand seperators
+// Rounds population to 3 sig figs
 function formatPopulation(num: number): string {
   if (num < 1e3) {
     return num.toString();
   }
   
-  // Calculate the appropriate scale (6 for Millions, 9 for Billions)
   const exponent = Math.floor(Math.log10(num) / 3) * 3;
   const scaledNum = num / Math.pow(10, exponent);
   
-  // toPrecision(3) gets the 3 most significant digits
   const suffix = ["", "k", "M", "B"][exponent / 3];
   
-  // parseFloat strips out any unnecessary trailing zeros (e.g., 8.00M becomes 8M)
   return parseFloat(scaledNum.toPrecision(3)) + suffix;
 }
 
