@@ -3,8 +3,7 @@ import { useMemo, useState } from 'react';
 import { Button, ComboboxItem, ComboboxItemGroup, Group, OptionsFilter, Select } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import { descriptions, synonyms } from './country';
-import { useSettings } from './SettingsProvider';
+import { synonyms } from './country';
 import wordlist from './wordlist';
 import continentData from './data/country-by-continent.json';
 
@@ -58,7 +57,6 @@ function buildGroupedData(
 function CountryForm({ onSubmit, guessed, revealedContinent = null, excludedContinents = [] }: CountryFormProps) {
   const [country, setCountry] = useState<string | null>(null);
   const isMobile = useMediaQuery(`(max-width: 600px)`);
-  const { hideHints } = useSettings();
 
   const excludedSet = useMemo(
     () => (excludedContinents instanceof Set ? excludedContinents : new Set(excludedContinents)),
@@ -111,16 +109,6 @@ function CountryForm({ onSubmit, guessed, revealedContinent = null, excludedCont
           onChange={(_value, option) => setCountry(option?.value)}
           size="md"
           value={country ?? null}
-          renderOption={({ option }) => (
-            <div>
-              <div>{option.label}</div>
-              {!hideHints && (
-                <div style={{ fontSize: '0.75rem', opacity: 0.6, lineHeight: 1.2 }}>
-                  {(descriptions as Record<string, string>)[option.value]}
-                </div>
-              )}
-            </div>
-          )}
         />
         <Button size="md" variant="contained" type="submit" style={{ overflow: 'visible' }}>Guess</Button>
       </Group>

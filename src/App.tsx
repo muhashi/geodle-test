@@ -8,13 +8,12 @@ import {
   Stack, Switch, Text, UnstyledButton, useMantineColorScheme, useMantineTheme,
 } from '@mantine/core';
 import {
-  IconBrandGithub, IconCoffee, IconHistory, IconMail, IconMoon, IconSettings, IconSun,
+  IconBrandGithub, IconCoffee, IconMail, IconMoon, IconSettings, IconSun,
 } from '@tabler/icons-react';
 
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import './App.css';
-import { AdBanner, AD_SLOTS } from './AdSense';
 import CountryForm from './CountryForm';
 import Results from './CountryResults';
 import { Footer, PrivacyPage, TermsPage, UpdatesPage } from './Footer';
@@ -63,9 +62,9 @@ const GITHUB_URL = 'https://github.com/muhashi/geodle';
 const TOTAL_GUESSES = 7;
 
 interface global {
-  playlightSDK?: {
-    setDiscovery: (show: boolean) => void;
-  };
+    playlightSDK?: {
+        setDiscovery: (show: boolean) => void;
+    };
 };
 
 function VerticalText({ top, bottom }: { top: string | number; bottom: string }) {
@@ -94,6 +93,10 @@ function CenterRow({ children, left, right }: { children: ReactNode; left?: Reac
     </Box>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Random-country selection
+// ---------------------------------------------------------------------------
 
 function pickRandomCountryData(): CountryData {
   const name = wordlist[Math.floor(Math.random() * wordlist.length)];
@@ -124,6 +127,8 @@ function loadStatistics(): Statistics {
   return Cookies.get('statistics') ? JSON.parse(Cookies.get('statistics')!) : DEFAULT_STATISTICS;
 }
 
+// Renders (and, once per day, records) the player's daily stats inline.
+// Only used for Daily games — Random games don't affect the streak/distribution.
 function DailyStatistics({ guessesData, isWon }: { guessesData: CountryData[]; isWon: boolean }) {
   const [statistics, setStatistics] = useState<Statistics>(loadStatistics);
 
@@ -173,7 +178,7 @@ function DailyStatistics({ guessesData, isWon }: { guessesData: CountryData[]; i
 function MoreGamesButton() {
   return (
     <Button
-      onClick={() => { (globalThis as global)?.playlightSDK?.setDiscovery(true) }}
+      onClick={() => {(globalThis as global)?.playlightSDK?.setDiscovery(true)}}
       variant="light"
     >
       More games
@@ -181,6 +186,7 @@ function MoreGamesButton() {
   );
 }
 
+// Shown once a game (daily or random) is finished, below the country stamp.
 function CompletionPanel({
   mode,
   guessesData,
@@ -336,13 +342,13 @@ function GamePage({
           isAreaMiles={areaMiles}
         />
       )}
-
-      {/* AdSense banners — top during play, bottom after completion */}
-      {!isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_TOP} style={{ maxWidth: 728, width: '100%' }} />}
-      {isDone && <AdBanner slot={AD_SLOTS.GAME_BANNER_BOTTOM} style={{ maxWidth: 728, width: '100%' }} />}
     </Stack>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Homepage + footer + static pages
+// ---------------------------------------------------------------------------
 
 function HomeActionCard({
   title,
@@ -390,8 +396,13 @@ function HomeActionCard({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Daily lock / resume status — drives the homepage Daily button
+// ---------------------------------------------------------------------------
+
 type DailyStatus = 'new' | 'in-progress' | 'done';
 
+// Reads today's saved daily progress (if any) straight from cookies.
 function getDailyStatus(): DailyStatus {
   const lastAttempt = Cookies.get('lastAttempt');
   const lastAttemptData = Cookies.get('lastAttemptData');
@@ -410,6 +421,7 @@ function getDailyStatus(): DailyStatus {
   }
 }
 
+// A new daily unlocks at the next local midnight.
 function msUntilNextDaily(): number {
   const next = new Date();
   next.setHours(24, 0, 0, 0);
@@ -425,6 +437,9 @@ function formatCountdown(ms: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
+// Renders the homepage's Daily tile in whichever of the three states applies:
+// not started yet, resumable (saved progress from earlier today), or done
+// (disabled, counting down to tomorrow's country).
 function DailyHomeCard({ onClick }: { onClick: () => void }) {
   const [status] = useState<DailyStatus>(getDailyStatus);
   const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextDaily()));
@@ -477,7 +492,7 @@ function HomePage({
     <Stack align="center" justify="space-between" mih="70vh" py="xl">
       <Stack align="center" gap="lg" mt="6vh" style={{ maxWidth: 480 }}>
         <Text ta="center" c="dimmed">
-          Guess the mystery country of the day based on demographics such as population, temperature, and religion.
+          Guess the mystery country of the day based on demographics such as population, temperature, and religion. 
         </Text>
 
         <Group mt="md" w="100%" wrap="nowrap">
@@ -485,9 +500,6 @@ function HomePage({
           <HomeActionCard title="Quick Play" subtitle="Unlimited practice!" onClick={onRandom} />
         </Group>
       </Stack>
-
-      {/* AdSense — home banner */}
-      <AdBanner slot={AD_SLOTS.HOME_BANNER} style={{ maxWidth: 728, width: '100%' }} />
 
       <Stack align="center" gap="md">
         <MoreGamesButton />
@@ -498,40 +510,32 @@ function HomePage({
 }
 
 function SettingsModal({ opened, setOpened }: { opened: boolean; setOpened: (open: boolean) => void }) {
-  const { tempFahrenheit, setTempFahrenheit, areaMiles, setAreaMiles, hideHints, setHideHints } = useSettings();
+  const { tempFahrenheit, setTempFahrenheit, areaMiles, setAreaMiles } = useSettings();
 
   return (
-    <Modal opened={opened} onClose={() => setOpened(false)} title="Settings" centered>
-      <Switch
-        className="settings-switch"
-        checked={tempFahrenheit}
-        label="Show temperatures in Fahrenheit"
-        onChange={(e) => setTempFahrenheit(e.currentTarget.checked)}
-      />
-      <Switch
-        className="settings-switch"
-        checked={areaMiles}
-        label="Show surface area in mi²"
-        onChange={(e) => setAreaMiles(e.currentTarget.checked)}
-        mt="md"
-      />
-      <Switch
-        className="settings-switch"
-        checked={hideHints}
-        label="Hide population hints"
-        onChange={(e) => setHideHints(e.currentTarget.checked)}
-        mt="md"
-      />
-      <Group justify="right" mt="md">
-        <Button variant="filled" onClick={() => setOpened(false)}>
-          Close
-        </Button>
-      </Group>
-    </Modal>
+      <Modal opened={opened} onClose={() => setOpened(false)} title="Settings" centered>
+        <Switch
+          className="settings-switch"
+          checked={tempFahrenheit}
+          label="Show temperatures in Fahrenheit"
+          onChange={(e) => setTempFahrenheit(e.currentTarget.checked)}
+        />
+        <Switch
+          className="settings-switch"
+          checked={areaMiles}
+          label="Show surface area in mi²"
+          onChange={(e) => setAreaMiles(e.currentTarget.checked)}
+          mt="md"
+        />
+        <Group justify="right" mt="md">
+          <Button variant="filled" onClick={() => setOpened(false)}>
+            Close
+          </Button>
+        </Group>
+      </Modal>
   );
 }
 
-// todo
 function DarkModeMenuItem() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
@@ -613,14 +617,6 @@ function Header({ onLogoClick, mode }: { onLogoClick: () => void; mode: GameMode
         >
           Donate
         </Menu.Item>
-        <Menu.Item
-          leftSection={<IconHistory size={16} />}
-          component="a"
-          href="https://old.geodle.me"
-          onClick={closeMenu}
-        >
-          Old site
-        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
@@ -679,7 +675,7 @@ function Content({
 
 export default function App() {
   const [view, setView] = useState<View>('home');
-  // Bumped every time game is restarted, so game component properly rerenders with new country
+  // Bumped every time Random is (re)started, so GamePage remounts with a fresh country.
   const [randomSeed, setRandomSeed] = useState(0);
   const theme = useMantineTheme();
 
